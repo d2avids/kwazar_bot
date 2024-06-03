@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   kwazar_bot:
@@ -7,7 +7,7 @@ services:
     restart: always
     volumes:
       - ./logs:/kwazar_bot/logs
-      - .kwazar_db:/kwazar_bot/kwazar_db
+      - ./kwazar_db.db:/kwazar_bot/kwazar_db.db
     environment:
       - PYTHONUNBUFFERED=1
     command: ["python", "main.py"]
