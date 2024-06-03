@@ -11,20 +11,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Upload repo as artifact
+      - name: Archive repo
+        run: tar -czf repo.tar.gz .
+
+      - name: Upload archive as artifact
         uses: actions/upload-artifact@v3
         with:
           name: repo-archive
-          path: .
+          path: repo.tar.gz
 
       - name: Download artifact on runner
         uses: actions/download-artifact@v3
         with:
           name: repo-archive
-          path: ./repo
-
-      - name: Create archive from artifact
-        run: tar -czf repo.tar.gz -C ./repo .
+          path: .
 
       - name: Copy compressed repo to server
         uses: appleboy/scp-action@v0.1.7
