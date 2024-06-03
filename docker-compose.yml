@@ -2,13 +2,12 @@ version: '3.8'
 
 services:
   kwazar_bot:
+    image: d2avids/kwazar_bot:latest
     env_file: .env
     restart: always
-    build:
-      context: .
-      dockerfile: Dockerfile
     volumes:
       - ./logs:/kwazar_bot/logs
+      - .kwazar_db:/kwazar_bot/kwazar_db
     environment:
       - PYTHONUNBUFFERED=1
     command: ["python", "main.py"]
