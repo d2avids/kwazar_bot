@@ -10,9 +10,17 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Compress repo for transfer
+
+      - name: Archive repo
         run: tar -czf repo.tar.gz .
-      - name: Copy compressed repo to server
+
+      - name: Upload archive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: repo-archive
+          path: repo.tar.gz
+
+      - name: Download artifact on remote server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HOST }}
@@ -20,7 +28,11 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           source: "repo.tar.gz"
           target: "kwazar_bot/repo.tar.gz"
-      - name: Extract repo on server and build Docker-container
+
+      - name: Clean up local artifact
+        run: rm repo.tar.gz
+
+      - name: Extract repo on server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
