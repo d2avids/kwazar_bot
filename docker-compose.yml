@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   kwazar_bot:
-    image: kwazar_bot:latest
     env_file: .env
     restart: always
     build:
