@@ -218,7 +218,8 @@ INDIVIDUAL_ANSWER = 'Индивидуальные'
 GROUP_ANSWER = 'Групповые'
 ANSWER_TYPES_BUTTONS = [
     [KeyboardButton(INDIVIDUAL_ANSWER)],
-    [KeyboardButton(GROUP_ANSWER)]
+    [KeyboardButton(GROUP_ANSWER)],
+    [KeyboardButton(CANCEL_ACTION)]
 ]
 CHOOSE_SCHOOL_NUMBER_MESSAGE = 'Напишите номер школы'
 CHOOSE_CLASS_NUMBER_MESSAGE = 'Напишите номер класса'

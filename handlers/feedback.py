@@ -7,7 +7,7 @@ from utils.constants import TASK_ANSWER_TEXT, FEEDBACK_TYPE, CHOOSE_TASK_TYPE_ME
     NO_ANSWERS_TO_ESTIMATE, NEXT_ACTION, ALLOWED_FEEDBACK, NOT_ALLOWED_FEEDBACK_MESSAGE, \
     ESTIMATED_ALL_ANSWERS_MESSAGE, STOPPED_ESTIMATING, INCORRECT_ACTION_CHOSEN, CHOOSE_ACTION_MESSAGE, \
     USER_FEEDBACK_NOTIFICATION_MESSAGE, CHOOSE_FEEDBACK, INDIVIDUAL_ANSWER, GROUP_ANSWER, ANSWER_TYPES_BUTTONS, \
-    GROUP_TYPE
+    GROUP_TYPE, CANCEL_ACTION
 
 from database.models import Task, User, UserAnswer, GroupTaskAnswer, Team
 from utils.decorators import with_db_session, tutor_or_admin_required
@@ -102,6 +102,8 @@ class AddFeedback:
     @with_db_session
     async def choose_answer_id_to_estimate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         feedback_type = update.message.text
+        if feedback_type == CANCEL_ACTION:
+            return ConversationHandler.END
         if feedback_type in (INDIVIDUAL_ANSWER, GROUP_ANSWER):
             context.user_data[
                 'feedback_type'] = INDIVIDUAL_ANSWER if feedback_type == INDIVIDUAL_ANSWER else GROUP_ANSWER

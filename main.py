@@ -96,7 +96,7 @@ async def main():
             CLASS_NUMBER: [MessageHandler(filters.TEXT, Registration.class_number_received)],
             CLASS_SYMBOL: [MessageHandler(filters.TEXT, Registration.class_symbol_received)]
         },
-        fallbacks=[CommandHandler('cancel_registration', Registration.cancel_registration)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     team_registration_handler = ConversationHandler(
         entry_points=[CommandHandler('register_team', TeamRegistration.start_team_registration)],
@@ -107,7 +107,7 @@ async def main():
             TEAM_CLASS_SYMBOL: [MessageHandler(filters.TEXT, TeamRegistration.class_symbol_received)],
             TEAM_CONFIRMATION: [MessageHandler(filters.TEXT, TeamRegistration.confirm_team)]
         },
-        fallbacks=[CommandHandler('cancel', TeamRegistration.cancel)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     verification_handler = ConversationHandler(
         entry_points=[CommandHandler('verify', Verification.start_verification)],
@@ -115,21 +115,21 @@ async def main():
             VERIFICATION_START: [MessageHandler(filters.TEXT, Verification.start_verification)],
             VERIFICATION_PROCESS: [MessageHandler(filters.TEXT, Verification.process_verification)],
         },
-        fallbacks=[CommandHandler('cancel', Registration.cancel_registration)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     search_user_handler = ConversationHandler(
         entry_points=[CommandHandler('search_user', SearchUser.ask_last_name)],
         states={
             SEARCH_USER: [MessageHandler(filters.TEXT, SearchUser.search_users_by_last_name)]
         },
-        fallbacks=[CommandHandler('cancel', Registration.cancel_registration)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_tutor_handler = ConversationHandler(
         entry_points=[CommandHandler('add_tutor', AddTutor.ask_user_id)],
         states={
             ADD_TUTOR: [MessageHandler(filters.TEXT, AddTutor.add_tutor)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_task_handler = ConversationHandler(
         entry_points=[MessageHandler(filters.Text(['Новое задание']), AddTask.ask_task_type)],
@@ -141,7 +141,7 @@ async def main():
             GETTING_ANSWERS_TIME: [
                 MessageHandler(filters.TEXT, AddTask.handle_getting_answers_time)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_user_task_answer_handler = ConversationHandler(
         entry_points=[MessageHandler(filters.Regex('^Дать ответ на индивидуальное задание$'),
@@ -149,7 +149,7 @@ async def main():
         states={
             TASK_ANSWER_TEXT: [MessageHandler(filters.TEXT, AddTaskUserAnswer.receive_task_answer)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_feedback_handler = ConversationHandler(
         entry_points=[MessageHandler(filters.Regex('^Проверка домашнего задания'), AddFeedback.start_feedback)],
@@ -159,7 +159,7 @@ async def main():
             GIVE_FEEDBACK: [MessageHandler(filters.TEXT, AddFeedback.give_feedback)],
             NEXT_ACTION: [MessageHandler(filters.TEXT, next_action)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     get_individual_report_handler = ConversationHandler(
         entry_points=[CommandHandler('report_individual', IndividualReport.start_report)],
@@ -167,7 +167,7 @@ async def main():
             START_DATE: [MessageHandler(filters.TEXT, IndividualReport.get_start_date)],
             END_DATE: [MessageHandler(filters.TEXT, IndividualReport.get_end_date)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     get_team_report_handler = ConversationHandler(
         entry_points=[CommandHandler('report_group', TeamReport.start_report)],
@@ -175,14 +175,14 @@ async def main():
             START_DATE: [MessageHandler(filters.TEXT, TeamReport.get_start_date)],
             END_DATE: [MessageHandler(filters.TEXT, TeamReport.get_end_date)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_team_task_answer_handler = ConversationHandler(
         entry_points=[CommandHandler('give_answer', AddGroupTaskAnswer.prompt_task_answer)],
         states={
             TASK_ANSWER_TEXT: [MessageHandler(filters.TEXT, AddGroupTaskAnswer.receive_task_answer)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
 
     app.add_handler(get_individual_report_handler)
