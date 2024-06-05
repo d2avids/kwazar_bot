@@ -1,10 +1,8 @@
-from datetime import datetime
-import pytz
+from datetime import datetime, timedelta
 
 
-def get_current_time_utc_plus_3():
+def get_current_time_utc_plus_3() -> datetime:
     """Получить текущее московское время."""
-    timezone_utc_plus_3 = pytz.timezone('Europe/Moscow')
-    current_time_utc = datetime.now(pytz.utc)
-    current_time_utc_plus_3 = current_time_utc.astimezone(timezone_utc_plus_3)
+    current_time_utc = datetime.now()
+    current_time_utc_plus_3 = current_time_utc + timedelta(hours=3)
     return current_time_utc_plus_3
