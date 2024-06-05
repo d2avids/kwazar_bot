@@ -57,7 +57,8 @@ class AddTaskUserAnswer:
         current_time = datetime.now()
         if task.getting_answers_time and current_time < task.getting_answers_time:
             await update.message.reply_text(
-                f'Ответ на задание можно отправить не ранее {task.getting_answers_time.strftime("%d.%m.%Y %H:%M")}'
+                f'Ответ на задание можно отправить не ранее {task.getting_answers_time.strftime("%d.%m.%Y %H:%M")}. '
+                f'Текущее время: {current_time}'
             )
             return ConversationHandler.END
 
