@@ -211,9 +211,9 @@ class AddTask:
             )
             return GETTING_ANSWERS_TIME
 
-        if getting_answers_time > context.user_data['sending_task_time']:
+        if getting_answers_time < context.user_data['sending_task_time']:
             await update.message.reply_text(
-                'Время начала принятия ответов не может быть позже времени отправки задания. '
+                'Время начала принятия ответов не может быть раньше времени отправки задания. '
                 'Пожалуйста, введите корректное время или нажмите "Отменить".'
             )
             return GETTING_ANSWERS_TIME
