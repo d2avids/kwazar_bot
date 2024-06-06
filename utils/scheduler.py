@@ -9,9 +9,11 @@ from telegram.ext import ContextTypes
 
 from utils.constants import INDIVIDUAL_TYPE, GROUP_TYPE
 from database.models import Task, User, Team
+from utils.utils import adjust_datetime_for_scheduler
 
 scheduler = AsyncIOScheduler()
 logger = logging.getLogger(__name__)
+
 
 
 async def send_individual_task(task_id: int, context: ContextTypes.DEFAULT_TYPE):
@@ -69,16 +71,17 @@ def job_listener(event):
 
 
 async def schedule_task(task_id: int, task_type: str, sending_task_time: datetime, context: ContextTypes.DEFAULT_TYPE):
+    run_date = adjust_datetime_for_scheduler(sending_task_time)
     if task_type == INDIVIDUAL_TYPE:
         scheduler.add_job(
             send_individual_task,
-            DateTrigger(run_date=sending_task_time),
+            DateTrigger(run_date=run_date),
             args=[task_id, context]
         )
     elif task_type == GROUP_TYPE:
         scheduler.add_job(
             send_group_task,
-            DateTrigger(run_date=sending_task_time),
+            DateTrigger(run_date=run_date),
             args=[task_id, context]
         )
     if not scheduler.running:
