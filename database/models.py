@@ -1,10 +1,12 @@
 from sqlalchemy import String, DateTime, func, ForeignKey, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
+from utils.utils import get_current_datetime
+
 
 class Base(DeclarativeBase):
-    created: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
-    updated: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
+    created: Mapped[DateTime] = mapped_column(DateTime, default=get_current_datetime())
+    updated: Mapped[DateTime] = mapped_column(DateTime, default=get_current_datetime(), onupdate=get_current_datetime())
 
 
 class User(Base):

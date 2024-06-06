@@ -9,6 +9,5 @@ services:
       - ./logs:/kwazar_bot/logs
       - ./kwazar_db.db:/kwazar_bot/kwazar_db.db
     environment:
-      - ENV TZ="Europe/Moscow"
       - PYTHONUNBUFFERED=1
     command: ["python", "main.py"]
