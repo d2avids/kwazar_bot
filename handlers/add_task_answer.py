@@ -6,7 +6,6 @@ from utils.constants import TASK_ANSWER_TEXT, GROUP_TYPE, INDIVIDUAL_TYPE, TEAM_
 
 from database.models import Task, User, UserAnswer, Team, GroupTaskAnswer
 from utils.decorators import with_db_session
-from utils.utils import get_current_time_utc_plus_3
 
 
 class AddTaskUserAnswer:
@@ -55,7 +54,7 @@ class AddTaskUserAnswer:
             await update.message.reply_text('Нет активных индивидуальных заданий')
             return ConversationHandler.END
 
-        current_time = get_current_time_utc_plus_3()
+        current_time = datetime.now()
         if task.getting_answers_time and current_time < task.getting_answers_time:
             await update.message.reply_text(
                 f'Ответ на задание можно отправить не ранее {task.getting_answers_time.strftime("%d.%m.%Y %H:%M")}. '
@@ -106,7 +105,7 @@ class AddGroupTaskAnswer:
             await update.message.reply_text('Нет активных групповых заданий')
             return ConversationHandler.END
 
-        current_time = get_current_time_utc_plus_3()
+        current_time = datetime.now()
         if current_time < task.getting_answers_time:
             await update.message.reply_text(
                 f'Ответ на задание можно отправить не ранее {task.getting_answers_time.strftime("%d.%m.%Y %H:%M")}. '

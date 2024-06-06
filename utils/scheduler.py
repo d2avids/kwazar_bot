@@ -72,13 +72,13 @@ async def schedule_task(task_id: int, task_type: str, sending_task_time: datetim
     if task_type == INDIVIDUAL_TYPE:
         scheduler.add_job(
             send_individual_task,
-            DateTrigger(run_date=sending_task_time+timedelta(hours=-3)),
+            DateTrigger(run_date=sending_task_time),
             args=[task_id, context]
         )
     elif task_type == GROUP_TYPE:
         scheduler.add_job(
             send_group_task,
-            DateTrigger(run_date=sending_task_time+timedelta(hours=-3)),
+            DateTrigger(run_date=sending_task_time),
             args=[task_id, context]
         )
     if not scheduler.running:
