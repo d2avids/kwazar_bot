@@ -19,7 +19,8 @@ from utils.constants import START_MESSAGE, ABOUT_PROJECT_MESSAGE, INSTRUCTIONS_M
     TASK_DEADLINE, TASK_TEXT, SENDING_TASK_TIME, GETTING_ANSWERS_TIME, TASK_ANSWER_TEXT, FEEDBACK_TYPE, CHOOSE_FEEDBACK, \
     GIVE_FEEDBACK, NEXT_ACTION, START_DATE, END_DATE, TEAM_NAME, TEAM_SCHOOL_NAME, TEAM_CLASS_NUMBER, TEAM_CLASS_SYMBOL, \
     TEAM_CONFIRMATION, TEAM_BUTTONS, REGISTRATION_MESSAGE, TEAM_REGISTRATION_MESSAGE, GIVE_INDIVIDUAL_ANSWER, \
-    GIVE_TEAM_ANSWER, CHECK_ANSWERS, BOT_INSTRUCTION, ADD_NEW_TASK, ADMIN_TELEGRAM_ID
+    GIVE_TEAM_ANSWER, CHECK_ANSWERS, BOT_INSTRUCTION, ADD_NEW_TASK, ADMIN_TELEGRAM_ID, INDIVIDUAL_MARKS, TEAM_MARKS, \
+    GET_INDIVIDUAL_REPORT, GET_TEAM_REPORT
 
 from utils.decorators import with_db_session
 from database.engine import create_db
@@ -168,7 +169,7 @@ async def main():
         fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     get_individual_report_handler = ConversationHandler(
-        entry_points=[CommandHandler('report_individual', IndividualReport.start_report)],
+        entry_points=[MessageHandler(filters.Regex(f'^{GET_INDIVIDUAL_REPORT}$'), IndividualReport.start_report)],
         states={
             START_DATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, IndividualReport.get_start_date)],
             END_DATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, IndividualReport.get_end_date)]
@@ -176,7 +177,7 @@ async def main():
         fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     get_team_report_handler = ConversationHandler(
-        entry_points=[CommandHandler('report_group', TeamReport.start_report)],
+        entry_points=[MessageHandler(filters.Regex(f'^{GET_TEAM_REPORT}$'), TeamReport.start_report)],
         states={
             START_DATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, TeamReport.get_start_date)],
             END_DATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, TeamReport.get_end_date)]
@@ -204,8 +205,8 @@ async def main():
     app.add_handler(team_registration_handler, 9)
     app.add_handler(registration_handler, 10)
     app.add_handler(verification_handler, 11)
-    app.add_handler(CommandHandler('individual_feedback', GetFeedback.get_individual_feedback), 12)
-    app.add_handler(CommandHandler('group_feedback', GetFeedback.get_team_feedback), 13)
+    app.add_handler(MessageHandler(filters.Regex(f'^{INDIVIDUAL_MARKS}$'), GetFeedback.get_individual_feedback), 12)
+    app.add_handler(MessageHandler(filters.Regex(f'^{TEAM_MARKS}$'), GetFeedback.get_team_feedback), 13)
     app.add_handler(CommandHandler('start', start), 14)
     app.add_handler(CommandHandler('finish_test', finish_test), 15)
     app.add_handler(MessageHandler(filters.Text([ABOUT_PROJECT_MESSAGE]), send_about_project_message), 16)

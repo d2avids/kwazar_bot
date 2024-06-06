@@ -11,6 +11,10 @@ TEAM_REGISTRATION_MESSAGE = 'Регистрация команды'
 ADD_NEW_TASK = 'Новое задание'
 GIVE_TEAM_ANSWER = 'Дать ответ на групповое задание'
 GIVE_INDIVIDUAL_ANSWER = 'Дать ответ на индивидуальное задание'
+TEAM_MARKS = 'Оценки группы'
+INDIVIDUAL_MARKS = 'Мои оценки'
+GET_TEAM_REPORT = 'Получить отчет по групповым заданиям'
+GET_INDIVIDUAL_REPORT = 'Получить отчет по индивидуальным заданиям'
 CHECK_ANSWERS = 'Проверка домашнего задания'
 CANCEL_ACTION = 'Отменить'
 NEW_USER_NOTIFICATION = (
@@ -23,15 +27,19 @@ USER_BUTTONS = [
     [KeyboardButton(ABOUT_PROJECT_MESSAGE)],
     [KeyboardButton(BOT_INSTRUCTION)],
     [KeyboardButton(REGISTRATION_MESSAGE)],
-    [KeyboardButton(GIVE_INDIVIDUAL_ANSWER)]
+    [KeyboardButton(GIVE_INDIVIDUAL_ANSWER)],
+    [KeyboardButton(INDIVIDUAL_MARKS)]
 ]
 CURATOR_BUTTONS = [
-    [KeyboardButton('Проверка домашнего задания')],
-    [KeyboardButton('Новое задание')],
+    [KeyboardButton(CHECK_ANSWERS)],
+    [KeyboardButton(ADD_NEW_TASK)],
+    [KeyboardButton(GET_TEAM_REPORT)],
+    [KeyboardButton(GET_INDIVIDUAL_REPORT)]
 ]
 TEAM_BUTTONS = [
     [KeyboardButton(TEAM_REGISTRATION_MESSAGE)],
-    [KeyboardButton(GIVE_TEAM_ANSWER)]
+    [KeyboardButton(GIVE_TEAM_ANSWER)],
+    [KeyboardButton(TEAM_MARKS)]
 ]
 ADD_GROUP_TASK_BUTTON = 'Создать новое групповое задание'
 ADD_INDIVIDUAL_TASK_BUTTON = 'Создать новое индивидуальное задание'
