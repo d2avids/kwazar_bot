@@ -19,7 +19,7 @@ from utils.constants import START_MESSAGE, ABOUT_PROJECT_MESSAGE, INSTRUCTIONS_M
     TASK_DEADLINE, TASK_TEXT, SENDING_TASK_TIME, GETTING_ANSWERS_TIME, TASK_ANSWER_TEXT, FEEDBACK_TYPE, CHOOSE_FEEDBACK, \
     GIVE_FEEDBACK, NEXT_ACTION, START_DATE, END_DATE, TEAM_NAME, TEAM_SCHOOL_NAME, TEAM_CLASS_NUMBER, TEAM_CLASS_SYMBOL, \
     TEAM_CONFIRMATION, TEAM_BUTTONS, REGISTRATION_MESSAGE, TEAM_REGISTRATION_MESSAGE, GIVE_INDIVIDUAL_ANSWER, \
-    GIVE_TEAM_ANSWER, CHECK_ANSWERS, BOT_INSTRUCTION, ADD_NEW_TASK
+    GIVE_TEAM_ANSWER, CHECK_ANSWERS, BOT_INSTRUCTION, ADD_NEW_TASK, ADMIN_TELEGRAM_ID
 
 from utils.decorators import with_db_session
 from database.engine import create_db
@@ -66,7 +66,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         stmt = select(User).filter_by(telegram_id=user_telegram_id)
         result = await db_session.execute(stmt)
         user = result.scalars().one_or_none()
-        if user and user.is_curator:
+        if user and user.is_curator or user_telegram_id == ADMIN_TELEGRAM_ID:
             buttons = CURATOR_BUTTONS
         else:
             buttons = USER_BUTTONS
