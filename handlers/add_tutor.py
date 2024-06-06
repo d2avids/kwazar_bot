@@ -2,7 +2,8 @@ from sqlalchemy import select
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 
-from utils.constants import ADD_TUTOR_SUCCESS, ADD_TUTOR, ASK_ID_TUTOR_TO_ADD, CANCEL_ACTION, CANCEL_BUTTON
+from utils.constants import ADD_TUTOR_SUCCESS, ADD_TUTOR, ASK_ID_TUTOR_TO_ADD, CANCEL_ACTION, CANCEL_BUTTON, \
+    INCORRECT_ID, TUTOR_ID_NOT_FOUND
 from utils.decorators import with_db_session, admin_required
 from database.models import User
 
@@ -22,14 +23,14 @@ class AddTutor:
         if tutor_id == CANCEL_ACTION:
             return ConversationHandler.END
         if not tutor_id.isdigit():
-            await update.message.reply_text('Введен некорректный ID пользователя')
+            await update.message.reply_text(INCORRECT_ID.format(id=tutor_id))
             return ConversationHandler.END
         db_session = context.chat_data['db_session']
         stmt = select(User).filter_by(id=tutor_id)
         result = await db_session.execute(stmt)
         user = result.scalars().first()
         if not user:
-            await update.message.reply_text(f'Пользователь с ID {tutor_id} не найден.')
+            await update.message.reply_text(TUTOR_ID_NOT_FOUND.format(id=tutor_id))
             return ConversationHandler.END
         user.is_curator = True
         await db_session.commit()

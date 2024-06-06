@@ -18,7 +18,8 @@ from utils.constants import START_MESSAGE, ABOUT_PROJECT_MESSAGE, INSTRUCTIONS_M
     VERIFICATION_START, VERIFICATION_PROCESS, SEARCH_USER, ADD_TUTOR, USER_BUTTONS, CURATOR_BUTTONS, TASK_TYPE, \
     TASK_DEADLINE, TASK_TEXT, SENDING_TASK_TIME, GETTING_ANSWERS_TIME, TASK_ANSWER_TEXT, FEEDBACK_TYPE, CHOOSE_FEEDBACK, \
     GIVE_FEEDBACK, NEXT_ACTION, START_DATE, END_DATE, TEAM_NAME, TEAM_SCHOOL_NAME, TEAM_CLASS_NUMBER, TEAM_CLASS_SYMBOL, \
-    TEAM_CONFIRMATION
+    TEAM_CONFIRMATION, TEAM_BUTTONS, REGISTRATION_MESSAGE, TEAM_REGISTRATION_MESSAGE, GIVE_INDIVIDUAL_ANSWER, \
+    GIVE_TEAM_ANSWER, CHECK_ANSWERS, BOT_INSTRUCTION, ADD_NEW_TASK
 
 from utils.decorators import with_db_session
 from database.engine import create_db
@@ -58,15 +59,19 @@ logger.addHandler(handler)
 
 @with_db_session
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_telegram_id = update.message.chat_id
-    db_session = context.chat_data['db_session']
-    stmt = select(User).filter_by(telegram_id=user_telegram_id)
-    result = await db_session.execute(stmt)
-    user = result.scalars().one_or_none()
-    if not user or not user.is_curator:
-        buttons = USER_BUTTONS
-    elif user and user.is_curator:
-        buttons = CURATOR_BUTTONS
+    chat_type = update.message.chat.type
+    if chat_type not in ['group', 'supergroup']:
+        user_telegram_id = update.message.chat_id
+        db_session = context.chat_data['db_session']
+        stmt = select(User).filter_by(telegram_id=user_telegram_id)
+        result = await db_session.execute(stmt)
+        user = result.scalars().one_or_none()
+        if user and user.is_curator:
+            buttons = CURATOR_BUTTONS
+        else:
+            buttons = USER_BUTTONS
+    else:
+        buttons = TEAM_BUTTONS
     reply_markup = ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
     await update.message.reply_text(START_MESSAGE, reply_markup=reply_markup)
 
@@ -88,7 +93,7 @@ async def main():
     app = ApplicationBuilder().token("7051184649:AAHkfbd_ghMDI-SgDJfvxhbrQ7iwZYPn49A").build()
 
     registration_handler = ConversationHandler(
-        entry_points=[MessageHandler(filters.Text(['Регистрация']), Registration.start_registration)],
+        entry_points=[MessageHandler(filters.Text([REGISTRATION_MESSAGE]), Registration.start_registration)],
         states={
             SURNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, Registration.last_name_received)],
             NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, Registration.first_name_received)],
@@ -100,7 +105,7 @@ async def main():
         fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     team_registration_handler = ConversationHandler(
-        entry_points=[CommandHandler('register_team', TeamRegistration.start_team_registration)],
+        entry_points=[MessageHandler(filters.Text([TEAM_REGISTRATION_MESSAGE]), TeamRegistration.start_team_registration)],
         states={
             TEAM_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, TeamRegistration.team_name_received)],
             TEAM_SCHOOL_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, TeamRegistration.school_name_received)],
@@ -133,7 +138,7 @@ async def main():
         fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_task_handler = ConversationHandler(
-        entry_points=[MessageHandler(filters.Text(['Новое задание']), AddTask.ask_task_type)],
+        entry_points=[MessageHandler(filters.Text([ADD_NEW_TASK]), AddTask.ask_task_type)],
         states={
             TASK_TYPE: [MessageHandler(filters.TEXT & ~filters.COMMAND, AddTask.get_task_text)],
             TASK_TEXT: [MessageHandler(filters.TEXT & ~filters.COMMAND, AddTask.get_task_deadline)],
@@ -145,7 +150,7 @@ async def main():
         fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_user_task_answer_handler = ConversationHandler(
-        entry_points=[MessageHandler(filters.Regex('^Дать ответ на индивидуальное задание$'),
+        entry_points=[MessageHandler(filters.Regex(f'^{GIVE_INDIVIDUAL_ANSWER}$'),
                                      AddTaskUserAnswer.prompt_task_answer)],
         states={
             TASK_ANSWER_TEXT: [MessageHandler(filters.TEXT & ~filters.COMMAND, AddTaskUserAnswer.receive_task_answer)]
@@ -153,7 +158,7 @@ async def main():
         fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_feedback_handler = ConversationHandler(
-        entry_points=[MessageHandler(filters.Regex('^Проверка домашнего задания'), AddFeedback.start_feedback)],
+        entry_points=[MessageHandler(filters.Regex(f'^{CHECK_ANSWERS}'), AddFeedback.start_feedback)],
         states={
             FEEDBACK_TYPE: [MessageHandler(filters.TEXT & ~filters.COMMAND, AddFeedback.choose_answer_id_to_estimate)],
             CHOOSE_FEEDBACK: [MessageHandler(filters.TEXT & ~filters.COMMAND, AddFeedback.choose_allowed_feedback)],
@@ -179,7 +184,9 @@ async def main():
         fallbacks=[MessageHandler(filters.COMMAND, cancel)],
     )
     add_team_task_answer_handler = ConversationHandler(
-        entry_points=[CommandHandler('give_answer', AddGroupTaskAnswer.prompt_task_answer)],
+        entry_points=[MessageHandler(
+            filters.Regex(f'^{GIVE_TEAM_ANSWER}$'), AddGroupTaskAnswer.prompt_task_answer)
+        ],
         states={
             TASK_ANSWER_TEXT: [MessageHandler(filters.TEXT & ~filters.COMMAND, AddGroupTaskAnswer.receive_task_answer)]
         },
@@ -201,8 +208,8 @@ async def main():
     app.add_handler(CommandHandler('group_feedback', GetFeedback.get_team_feedback), 13)
     app.add_handler(CommandHandler('start', start), 14)
     app.add_handler(CommandHandler('finish_test', finish_test), 15)
-    app.add_handler(MessageHandler(filters.Text(['О проекте']), send_about_project_message), 16)
-    app.add_handler(MessageHandler(filters.Text(['Инструкция бота']), send_instruction_message), 17)
+    app.add_handler(MessageHandler(filters.Text([ABOUT_PROJECT_MESSAGE]), send_about_project_message), 16)
+    app.add_handler(MessageHandler(filters.Text([BOT_INSTRUCTION]), send_instruction_message), 17)
     app.add_handler(CommandHandler('cancel', cancel), 18)
     app.run_polling()
 

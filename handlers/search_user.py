@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 
-from utils.constants import REQUEST_LAST_NAME, ASK_ID_TUTOR_TO_ADD, SEARCH_USER
+from utils.constants import REQUEST_LAST_NAME, ASK_ID_TUTOR_TO_ADD, SEARCH_USER, USERS_NOT_FOUND
 from utils.decorators import with_db_session, admin_required
 from database.models import User
 
@@ -25,7 +25,7 @@ class SearchUser:
         users = result.scalars().all()
 
         if not users:
-            await update.message.reply_text('Зарегистрированные пользователи с такой фамилией не найдены.')
+            await update.message.reply_text(USERS_NOT_FOUND)
             return ConversationHandler.END
 
         message = 'Найденные пользователи:\n\n'

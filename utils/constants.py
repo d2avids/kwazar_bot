@@ -2,16 +2,36 @@ import os
 
 from telegram import KeyboardButton
 
+ADMIN_TELEGRAM_ID = os.getenv('ADMIN_TELEGRAM_ID')
+
+ABOUT_PROJECT_MESSAGE = 'О проекте'
+BOT_INSTRUCTION = 'Инструкция бота'
+REGISTRATION_MESSAGE = 'Регистрация'
+TEAM_REGISTRATION_MESSAGE = 'Регистрация команды'
+ADD_NEW_TASK = 'Новое задание'
+GIVE_TEAM_ANSWER = 'Дать ответ на групповое задание'
+GIVE_INDIVIDUAL_ANSWER = 'Дать ответ на индивидуальное задание'
+CHECK_ANSWERS = 'Проверка домашнего задания'
+CANCEL_ACTION = 'Отменить'
+NEW_USER_NOTIFICATION = (
+    'У нас новый зарегистрированный пользователь! Чтобы верифицировать или отклонить пользователей, '
+    'используйте команду /verify.'
+)
+
 # Buttons
 USER_BUTTONS = [
-    [KeyboardButton('О проекте')],
-    [KeyboardButton('Инструкция бота')],
-    [KeyboardButton('Регистрация')],
-    [KeyboardButton('Дать ответ на индивидуальное задание')]
+    [KeyboardButton(ABOUT_PROJECT_MESSAGE)],
+    [KeyboardButton(BOT_INSTRUCTION)],
+    [KeyboardButton(REGISTRATION_MESSAGE)],
+    [KeyboardButton(GIVE_INDIVIDUAL_ANSWER)]
 ]
 CURATOR_BUTTONS = [
     [KeyboardButton('Проверка домашнего задания')],
     [KeyboardButton('Новое задание')],
+]
+TEAM_BUTTONS = [
+    [KeyboardButton(TEAM_REGISTRATION_MESSAGE)],
+    [KeyboardButton(GIVE_TEAM_ANSWER)]
 ]
 ADD_GROUP_TASK_BUTTON = 'Создать новое групповое задание'
 ADD_INDIVIDUAL_TASK_BUTTON = 'Создать новое индивидуальное задание'
@@ -19,16 +39,9 @@ TASK_TYPES_BUTTONS = [
     [KeyboardButton(ADD_GROUP_TASK_BUTTON)],
     [KeyboardButton(ADD_INDIVIDUAL_TASK_BUTTON)]
 ]
+CANCEL_BUTTON = [[KeyboardButton(CANCEL_ACTION)]]
 
 # General
-CANCEL_ACTION = 'Отменить'
-CANCEL_BUTTON = [[KeyboardButton(CANCEL_ACTION)]]
-ADMIN_TELEGRAM_ID = os.getenv('ADMIN_TELEGRAM_ID')
-NEW_USER_NOTIFICATION = (
-    'У нас новый зарегистрированный пользователь! Чтобы верифицировать или отклонить пользователей, '
-    'используйте команду /verify.'
-)
-
 START_MESSAGE = (
     'Привет! Я - твой проводник в увлекательный мир КВАЗАР! '
     'Чем я могу тебе помочь?'
@@ -120,8 +133,10 @@ REGISTRATION_MESSAGE_CLASS_SYMBOL = (
 EXCEEDED_REGISTRATION_LIMIT_MESSAGE = (
     'Превышен лимит попыток прохождения регистрации'
 )
+REGISTRATION_REQUIRED_MESSAGE = 'Сначала необходимо зарегистрироваться'
 
 # Team Registration
+ONLY_TEAM_CHAT = 'Эту команду можно использовать только в групповом чате.'
 TEAM_NAME, TEAM_SCHOOL_NAME, TEAM_CLASS_NUMBER, TEAM_CLASS_SYMBOL, TEAM_CONFIRMATION = range(5)
 CONFIRMATION_BUTTONS = [
     [KeyboardButton('Да')],
@@ -151,26 +166,45 @@ MSG_CHAT_ALREADY_REGISTERED = (
 MSG_TEAM_REGISTERED_SUCCESS = 'Команда успешно зарегистрирована.'
 MSG_TEAM_REGISTRATION_CANCELLED = 'Регистрация команды отменена.'
 MSG_PROCESS_CANCELLED = 'Процесс регистрации команды отменен.'
+TEAM_REGISTRATION_REQUIRED = 'Этот чат не зарегистрирован как команда.'
 
 # Verification
 VERIFICATION_START, VERIFICATION_PROCESS = range(2)
 VERIFICATION_ACCEPT_COMMAND = 'Принять'
 VERIFICATION_REJECT_COMMAND = 'Отклонить'
+USERS_TO_VERIFY_OUTPUT_MESSAGE = (
+    'Вывод в формате <i>ID, ФИО, название школы, '
+    'цифра-буква класса, номер попытки регистрации, дата последней попытки</i>:\n\n'
+)
+NO_USERS_TO_VERIFY = 'Сейчас нет пользователей, ожидающих верификацию'
+INCORRECT_COMMAND = (
+    f'Неправильная команда. Используйте "{VERIFICATION_ACCEPT_COMMAND}" '
+    f'или "{VERIFICATION_REJECT_COMMAND}".'
+)
+ID_NOT_FOUND_OR_NOT_VERIFIED = 'Пользователь с ID {id} не найден или не ожидает верификации.'
+INCORRECT_ID = 'Недопустимый ID пользователя: {id}'
+INCORRECT_IDS = 'Нет действительных ID для обработки. Пожалуйста, введите корректные ID.'
+IDS_ACCEPTED = 'Успешно обработаны пользователи с ID {ids}'
+USER_ACCEPTED_NOTIFICATION = 'Ваша регистрация подтверждена администратором!'
+USER_REJECTED_NOTIFICATION = 'Администратор отклонил вашу заявку на регистрацию'
 VERIFICATION_MESSAGE = (
     f'Для верификации или отклонения запросов пользователей, используйте команду '
     f'"{VERIFICATION_ACCEPT_COMMAND}" или "{VERIFICATION_REJECT_COMMAND}". '
     'После указания команды, укажите через пробел ID пользователей, которых хотите верифицировать или отклонить. '
     'Пример: "Принять 1, 2, 3"'
 )
+VERIFICATION_REQUIRED_MESSAGE = 'Для этого действия необходимо быть верифицированным пользователем'
 
 # Search user
 SEARCH_USER = 0
+USERS_NOT_FOUND = 'Зарегистрированные пользователи с такой фамилией не найдены.'
 REQUEST_LAST_NAME = (
     'Введите фамилию пользователя, чтобы найти его в базе данных '
 )
 
 # Add tutor
 ADD_TUTOR = 0
+TUTOR_ID_NOT_FOUND = 'Пользователь с ID {tutor_id} не найден.'
 ASK_ID_TUTOR_TO_ADD = (
     'Введите ID пользователя, которого хотите назначить куратором. '
     'Для поиска ID пользователя по фамилии нажмите кнопку "Отменить", чтобы прервать текущий контекст '
@@ -212,10 +246,12 @@ TEAM_TASK_ANSWER_TEXT = range(1)
 
 # Feedback
 FEEDBACK_TYPE, CHOOSE_FEEDBACK, GIVE_FEEDBACK, NEXT_ACTION = range(4)
-ALLOWED_FEEDBACK = ('5', '4', '3', '2')
+ALLOWED_MARKS = ('5', '4', '3', '2')
 CHOOSE_TASK_TYPE_MESSAGE = 'Выберите, какие задания вы хотите оценить: групповые или индивидуальные'
 INDIVIDUAL_ANSWER = 'Индивидуальные'
 GROUP_ANSWER = 'Групповые'
+INCORRECT_ANSWER_MESSAGE = f'Пожалуйста, выберите "{INDIVIDUAL_ANSWER}" или "{GROUP_ANSWER}".'
+CHOOSE_MARK = f'Введите оценку ({", ".join(ALLOWED_MARKS)}):'
 ANSWER_TYPES_BUTTONS = [
     [KeyboardButton(INDIVIDUAL_ANSWER)],
     [KeyboardButton(GROUP_ANSWER)],
@@ -227,16 +263,24 @@ NO_ANSWERS_TO_ESTIMATE = 'Нет неоцененных {type} заданий.'
 ESTIMATED_ALL_ANSWERS_MESSAGE = 'Все задания оценены.'
 STOPPED_ESTIMATING = 'Сессия оценивания завершена.'
 CHOOSE_ACTION_MESSAGE = 'Выберите действие:'
+ANSWERS_NOT_FOUND = 'Нет ответов на {task_type} задания.'
 INCORRECT_ACTION_CHOSEN = 'Пожалуйста, выберите "{next_answer}" или "{stop}".'
 NOT_ALLOWED_FEEDBACK_MESSAGE = 'Пожалуйста, выберите оценку из предложенных вариантов ({allowed_feedback}).'
 USER_FEEDBACK_NOTIFICATION_MESSAGE = 'Ваш ответ на {task_type} задание оценен.'
+INCORRECT_ANSWER_ID = 'Некорректный ID ответа'
+USER_FEEDBACK_MARK_MESSAGE = 'Ваша оценка за последнее {task_type} задание: {mark}'
+ANSWER_IS_NOT_PROCESSED = 'Работа еще не проверена. Когда работа будет оценена, вам придет оповещение.'
+
 
 # Reports
 REPORTS_PATH = 'tmp'
 
-# Individual Report
+# Reports
 START_DATE, END_DATE = range(2)
-
+START_PERIOD_MESSAGE = 'Укажите начало периода, отчет по которому хотите получить в формате день.месяц.год'
+END_PERIOD_MESSAGE = 'Укажите конец периода, отчет по которому хотите получить в формате день.месяц.год'
+INCORRECT_DATE_MESSAGE = 'Неверный формат даты. Попробуйте снова.'
+NO_DATA_FOR_PERIOD = 'Нет данных за указанный период.'
 
 # Permissions
 ADMIN_ACCESS_FAILURE = 'Доступ к команде имеет только администратор'

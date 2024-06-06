@@ -9,7 +9,8 @@ from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import ConversationHandler, ContextTypes
 
 from database.models import UserAnswer, User, Task, GroupTaskAnswer, Team
-from utils.constants import INDIVIDUAL_TYPE, START_DATE, END_DATE, REPORTS_PATH, GROUP_TYPE
+from utils.constants import INDIVIDUAL_TYPE, START_DATE, END_DATE, REPORTS_PATH, GROUP_TYPE, START_PERIOD_MESSAGE, \
+    END_PERIOD_MESSAGE, INCORRECT_DATE_MESSAGE, NO_DATA_FOR_PERIOD
 from utils.decorators import tutor_or_admin_required, with_db_session
 
 
@@ -18,7 +19,7 @@ class IndividualReport:
     @tutor_or_admin_required
     async def start_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
-            'Укажите начало периода, отчет по которому хотите получить в формате день.месяц.год',
+            START_PERIOD_MESSAGE,
             reply_markup=ReplyKeyboardRemove()
         )
         return START_DATE
@@ -29,10 +30,10 @@ class IndividualReport:
         try:
             start_date = datetime.strptime(start_date_str, '%d.%m.%Y')
             context.user_data['start_date'] = start_date
-            await update.message.reply_text('Укажите конец периода, отчет по которому хотите получить в формате день.месяц.год')
+            await update.message.reply_text(END_PERIOD_MESSAGE)
             return END_DATE
         except ValueError:
-            await update.message.reply_text('Неверный формат даты. Попробуйте снова.')
+            await update.message.reply_text(INCORRECT_DATE_MESSAGE)
             return START_DATE
 
     @staticmethod
@@ -53,7 +54,7 @@ class IndividualReport:
             answers = result.fetchall()
 
             if not answers:
-                await update.message.reply_text('Нет данных за указанный период.')
+                await update.message.reply_text(NO_DATA_FOR_PERIOD)
                 return ConversationHandler.END
 
             data = []
@@ -78,7 +79,7 @@ class IndividualReport:
             return ConversationHandler.END
 
         except ValueError:
-            await update.message.reply_text('Неверный формат даты. Попробуйте снова.')
+            await update.message.reply_text(INCORRECT_DATE_MESSAGE)
             return END_DATE
 
 
@@ -87,7 +88,7 @@ class TeamReport:
     @tutor_or_admin_required
     async def start_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
-            'Укажите начало периода, отчет по которому хотите получить в формате день.месяц.год',
+            START_PERIOD_MESSAGE,
             reply_markup=ReplyKeyboardRemove()
         )
         return START_DATE
@@ -98,10 +99,10 @@ class TeamReport:
         try:
             start_date = datetime.strptime(start_date_str, '%d.%m.%Y')
             context.user_data['start_date'] = start_date
-            await update.message.reply_text('Укажите конец периода, отчет по которому хотите получить в формате день.месяц.год')
+            await update.message.reply_text(END_PERIOD_MESSAGE)
             return END_DATE
         except ValueError:
-            await update.message.reply_text('Неверный формат даты. Попробуйте снова.')
+            await update.message.reply_text(INCORRECT_DATE_MESSAGE)
             return START_DATE
 
     @staticmethod
@@ -125,7 +126,7 @@ class TeamReport:
             answers = result.fetchall()
 
             if not answers:
-                await update.message.reply_text('Нет данных за указанный период.')
+                await update.message.reply_text(NO_DATA_FOR_PERIOD)
                 return ConversationHandler.END
 
             data = []
@@ -154,5 +155,5 @@ class TeamReport:
             return ConversationHandler.END
 
         except ValueError as e:
-            await update.message.reply_text('Неверный формат даты. Попробуйте снова.')
+            await update.message.reply_text(INCORRECT_DATE_MESSAGE)
             return END_DATE

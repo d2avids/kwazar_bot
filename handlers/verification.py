@@ -1,7 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 from utils.constants import VERIFICATION_MESSAGE, VERIFICATION_PROCESS, VERIFICATION_ACCEPT_COMMAND, \
-    VERIFICATION_REJECT_COMMAND
+    VERIFICATION_REJECT_COMMAND, USER_REJECTED_NOTIFICATION, USER_ACCEPTED_NOTIFICATION, INCORRECT_IDS, INCORRECT_ID, \
+    ID_NOT_FOUND_OR_NOT_VERIFIED, IDS_ACCEPTED, INCORRECT_COMMAND, NO_USERS_TO_VERIFY, USERS_TO_VERIFY_OUTPUT_MESSAGE
 from sqlalchemy import select
 from utils.decorators import with_db_session, admin_required
 from database.models import User
@@ -17,11 +18,7 @@ class Verification:
         stmt = select(User).filter_by(is_verified=False, verification_waiting=True)
         result = await db_session.execute(stmt)
         not_verified_users = result.scalars().all()
-        print(f'Получены не верифицированные пользователи: {not_verified_users}')
-        message = (
-            'Вывод в формате <i>ID, ФИО, название школы, '
-            'цифра-буква класса, номер попытки регистрации, дата последней попытки</i>:\n\n'
-        ) if not_verified_users else 'Сейчас нет пользователей, ожидающих верификацию'
+        message = USERS_TO_VERIFY_OUTPUT_MESSAGE if not_verified_users else NO_USERS_TO_VERIFY
         counter = 0
         for user in not_verified_users:
             user_patronymic = f' {user.patronymic}' if user.patronymic else ''
@@ -53,10 +50,7 @@ class Verification:
         user_ids = text_parts[1:]  # Айдишники пользователей
 
         if action not in [VERIFICATION_ACCEPT_COMMAND.lower(), VERIFICATION_REJECT_COMMAND.lower()]:
-            await update.message.reply_text(
-                f'Неправильная команда. Используйте "{VERIFICATION_ACCEPT_COMMAND}" '
-                f'или "{VERIFICATION_REJECT_COMMAND}".'
-            )
+            await update.message.reply_text(INCORRECT_COMMAND)
             return VERIFICATION_PROCESS
 
         valid_ids = []
@@ -70,30 +64,26 @@ class Verification:
                 if user:
                     valid_ids.append(user)
                 else:
-                    await update.message.reply_text(
-                        f'Пользователь с ID {user_id} не найден или не ожидает верификации.'
-                    )
+                    await update.message.reply_text(ID_NOT_FOUND_OR_NOT_VERIFIED.format(id=user_id))
             except ValueError:
-                await update.message.reply_text(f'Недопустимый ID пользователя: {user_id}')
+                await update.message.reply_text(INCORRECT_ID.format(id=user_id))
 
         if not valid_ids:
-            await update.message.reply_text('Нет действительных ID для обработки. Пожалуйста, введите корректные ID.')
+            await update.message.reply_text(INCORRECT_IDS)
             return VERIFICATION_PROCESS
 
         for user in valid_ids:
             if action == VERIFICATION_ACCEPT_COMMAND.lower():
                 user.is_verified = True
                 try:
-                    await context.bot.send_message(
-                        chat_id=user.telegram_id, text='Ваша регистрация подтверждена администратором!'
-                    )
+                    await context.bot.send_message(chat_id=user.telegram_id, text=USER_ACCEPTED_NOTIFICATION)
                 except Exception:
                     pass
             else:
                 try:
                     await context.bot.send_message(
                         chat_id=user.telegram_id,
-                        text='Администратор отклонил вашу заявку на регистрацию'
+                        text=USER_REJECTED_NOTIFICATION
                     )
                 except Exception:
                     pass
@@ -101,6 +91,5 @@ class Verification:
             db_session.add(user)
 
         await db_session.commit()
-        await update.message.reply_text(
-            f'Успешно обработаны пользователи с ID {", ".join([str(user.id) for user in valid_ids])}.')
+        await update.message.reply_text(IDS_ACCEPTED.format(ids=", ".join([str(user.id) for user in valid_ids])))
         return ConversationHandler.END

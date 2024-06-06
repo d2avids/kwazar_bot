@@ -4,10 +4,12 @@ from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 from utils.constants import TASK_ANSWER_TEXT, FEEDBACK_TYPE, CHOOSE_TASK_TYPE_MESSAGE, \
     CHOOSE_SCHOOL_NUMBER_MESSAGE, CHOOSE_CLASS_NUMBER_MESSAGE, CLASS_NUMBER, INDIVIDUAL_TYPE, GIVE_FEEDBACK, \
-    NO_ANSWERS_TO_ESTIMATE, NEXT_ACTION, ALLOWED_FEEDBACK, NOT_ALLOWED_FEEDBACK_MESSAGE, \
+    NO_ANSWERS_TO_ESTIMATE, NEXT_ACTION, ALLOWED_MARKS, NOT_ALLOWED_FEEDBACK_MESSAGE, \
     ESTIMATED_ALL_ANSWERS_MESSAGE, STOPPED_ESTIMATING, INCORRECT_ACTION_CHOSEN, CHOOSE_ACTION_MESSAGE, \
     USER_FEEDBACK_NOTIFICATION_MESSAGE, CHOOSE_FEEDBACK, INDIVIDUAL_ANSWER, GROUP_ANSWER, ANSWER_TYPES_BUTTONS, \
-    GROUP_TYPE, CANCEL_ACTION
+    GROUP_TYPE, CANCEL_ACTION, INCORRECT_ANSWER_MESSAGE, CHOOSE_MARK, INCORRECT_ANSWER_ID, \
+    REGISTRATION_REQUIRED_MESSAGE, VERIFICATION_REQUIRED_MESSAGE, ANSWERS_NOT_FOUND, TEAM_REGISTRATION_REQUIRED, \
+    ONLY_TEAM_CHAT, USER_FEEDBACK_MARK_MESSAGE, ANSWER_IS_NOT_PROCESSED
 
 from database.models import Task, User, UserAnswer, GroupTaskAnswer, Team
 from utils.decorators import with_db_session, tutor_or_admin_required
@@ -136,7 +138,7 @@ class AddFeedback:
             )
             return CHOOSE_FEEDBACK
         else:
-            await update.message.reply_text(f'Пожалуйста, выберите "{INDIVIDUAL_ANSWER}" или "{GROUP_ANSWER}".')
+            await update.message.reply_text(INCORRECT_ANSWER_MESSAGE)
             return FEEDBACK_TYPE
 
     @staticmethod
@@ -163,16 +165,16 @@ class AddFeedback:
             await update.message.reply_text('Некорректный ID ответа')
             return ConversationHandler.END
 
-        reply_markup = ReplyKeyboardMarkup([[*ALLOWED_FEEDBACK]], resize_keyboard=True, one_time_keyboard=True)
-        await update.message.reply_text(f'Введите оценку ({", ".join(ALLOWED_FEEDBACK)}):', reply_markup=reply_markup)
+        reply_markup = ReplyKeyboardMarkup([[*ALLOWED_MARKS]], resize_keyboard=True, one_time_keyboard=True)
+        await update.message.reply_text(CHOOSE_MARK, reply_markup=reply_markup)
         return GIVE_FEEDBACK
 
     @staticmethod
     @with_db_session
     async def give_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         feedback = update.message.text
-        if feedback not in ALLOWED_FEEDBACK:
-            await update.message.reply_text(NOT_ALLOWED_FEEDBACK_MESSAGE.format(allowed_feedback=ALLOWED_FEEDBACK))
+        if feedback not in ALLOWED_MARKS:
+            await update.message.reply_text(NOT_ALLOWED_FEEDBACK_MESSAGE.format(allowed_feedback=ALLOWED_MARKS))
             return GIVE_FEEDBACK
 
         feedback = int(feedback)
@@ -193,7 +195,7 @@ class AddFeedback:
         answer = result.scalar()
 
         if not answer:
-            await update.message.reply_text('Некорректный ID ответа')
+            await update.message.reply_text(INCORRECT_ANSWER_ID)
             return ConversationHandler.END
 
         answer.curator_feedback = feedback
@@ -231,10 +233,10 @@ class GetFeedback:
         user = result.scalar()
 
         if not user:
-            await update.message.reply_text('Сначала необходимо зарегистрироваться')
+            await update.message.reply_text(REGISTRATION_REQUIRED_MESSAGE)
             return
         elif user and not user.is_verified:
-            await update.message.reply_text('Для этого действия необходимо быть верифицированным пользователем')
+            await update.message.reply_text(VERIFICATION_REQUIRED_MESSAGE)
             return
 
         stmt = select(UserAnswer).join(Task).filter(
@@ -245,17 +247,15 @@ class GetFeedback:
         last_answer = result.scalars().first()
 
         if not last_answer:
-            await update.message.reply_text('Нет ответов на индивидуальные задания.')
+            await update.message.reply_text(ANSWERS_NOT_FOUND.format(task_type='индивидуальные'))
             return
 
         if last_answer.curator_feedback is not None:
             await update.message.reply_text(
-                f'Ваша оценка за последнее индивидуальное задание: {last_answer.curator_feedback}'
+                USER_FEEDBACK_MARK_MESSAGE.format(task_type='индивидуальное', mark=last_answer.curator_feedback)
             )
         else:
-            await update.message.reply_text(
-                'Работа еще не проверена. Когда работа будет оценена, вам придет оповещение.'
-            )
+            await update.message.reply_text(ANSWER_IS_NOT_PROCESSED)
 
     @staticmethod
     @with_db_session
@@ -265,7 +265,7 @@ class GetFeedback:
         db_session = context.chat_data['db_session']
 
         if chat_type not in ['group', 'supergroup']:
-            await update.message.reply_text('Эту команду можно использовать только в групповом чате.')
+            await update.message.reply_text(ONLY_TEAM_CHAT)
             return
 
         stmt = select(Team).filter_by(telegram_id=chat_id)
@@ -273,7 +273,7 @@ class GetFeedback:
         team = result.scalars().first()
 
         if not team:
-            await update.message.reply_text('Этот чат не зарегистрирован как команда.')
+            await update.message.reply_text(TEAM_REGISTRATION_REQUIRED)
             return
 
         stmt = select(GroupTaskAnswer).join(Task).filter(
@@ -284,14 +284,12 @@ class GetFeedback:
         last_answer = result.scalars().first()
 
         if not last_answer:
-            await update.message.reply_text('Нет ответов на групповые задания.')
+            await update.message.reply_text(ANSWERS_NOT_FOUND.format(task_type='групповые'))
             return
 
         if last_answer.curator_feedback is not None:
             await update.message.reply_text(
-                f'Ваша оценка за последнее групповое задание: {last_answer.curator_feedback}'
+                USER_FEEDBACK_MARK_MESSAGE.format(task_type='групповое', mark=last_answer.curator_feedback)
             )
         else:
-            await update.message.reply_text(
-                'Работа еще не проверена. Когда работа будет оценена, вам придет оповещение.'
-            )
+            await update.message.reply_text(ANSWER_IS_NOT_PROCESSED)
