@@ -2,7 +2,7 @@ import os
 
 from telegram import KeyboardButton
 
-ADMIN_TELEGRAM_ID = os.getenv('ADMIN_TELEGRAM_ID')
+ADMIN_TELEGRAM_ID: str = os.getenv('ADMIN_TELEGRAM_ID')
 
 ABOUT_PROJECT_MESSAGE = 'О проекте'
 BOT_INSTRUCTION = 'Инструкция бота'

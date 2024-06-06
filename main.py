@@ -66,7 +66,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         stmt = select(User).filter_by(telegram_id=user_telegram_id)
         result = await db_session.execute(stmt)
         user = result.scalars().one_or_none()
-        if user and user.is_curator or str(user_telegram_id) == str(ADMIN_TELEGRAM_ID):
+        if user and user.is_curator or str(user_telegram_id) == ADMIN_TELEGRAM_ID:
             buttons = CURATOR_BUTTONS
         else:
             buttons = USER_BUTTONS

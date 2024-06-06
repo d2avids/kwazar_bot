@@ -36,7 +36,7 @@ def tutor_or_admin_required(func):
     async def wrapped(update, context, *args, **kwargs):
         async with session_maker() as session:
             user_id = update.message.chat_id
-            if str(user_id) != str(ADMIN_TELEGRAM_ID):
+            if str(user_id) != ADMIN_TELEGRAM_ID:
                 stmt = select(User).filter_by(telegram_id=user_id, is_curator=True)
                 is_curator = await session.execute(stmt)
                 result = is_curator.scalar_one_or_none()
