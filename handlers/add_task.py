@@ -70,7 +70,11 @@ class AddTask:
         if not_finished_tasks:
             await update.message.reply_text(TASK_ALREADY_EXISTS)
             return ConversationHandler.END
-        reply_markup = ReplyKeyboardMarkup(TASK_TYPES_BUTTONS + CANCEL_BUTTON, resize_keyboard=True, one_time_keyboard=True)
+        reply_markup = ReplyKeyboardMarkup(
+            TASK_TYPES_BUTTONS + CANCEL_BUTTON,
+            resize_keyboard=True,
+            one_time_keyboard=True
+        )
         await update.message.reply_text(ADD_TASK_TYPE_MESSAGE, reply_markup=reply_markup)
         return TASK_TYPE
 
