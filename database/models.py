@@ -1,4 +1,4 @@
-from sqlalchemy import String, DateTime, func, ForeignKey, Integer
+from sqlalchemy import DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from utils.utils import get_current_datetime

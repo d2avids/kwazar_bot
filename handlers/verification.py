@@ -1,11 +1,16 @@
+from sqlalchemy import select
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
-from utils.constants import VERIFICATION_MESSAGE, VERIFICATION_PROCESS, VERIFICATION_ACCEPT_COMMAND, \
-    VERIFICATION_REJECT_COMMAND, USER_REJECTED_NOTIFICATION, USER_ACCEPTED_NOTIFICATION, INCORRECT_IDS, INCORRECT_ID, \
-    ID_NOT_FOUND_OR_NOT_VERIFIED, IDS_ACCEPTED, INCORRECT_COMMAND, NO_USERS_TO_VERIFY, USERS_TO_VERIFY_OUTPUT_MESSAGE
-from sqlalchemy import select
-from utils.decorators import with_db_session, admin_required
+
 from database.models import User
+from utils.constants import (ID_NOT_FOUND_OR_NOT_VERIFIED, IDS_ACCEPTED,
+                             INCORRECT_COMMAND, INCORRECT_ID, INCORRECT_IDS,
+                             NO_USERS_TO_VERIFY, USER_ACCEPTED_NOTIFICATION,
+                             USER_REJECTED_NOTIFICATION,
+                             USERS_TO_VERIFY_OUTPUT_MESSAGE,
+                             VERIFICATION_ACCEPT_COMMAND, VERIFICATION_MESSAGE,
+                             VERIFICATION_PROCESS, VERIFICATION_REJECT_COMMAND)
+from utils.decorators import admin_required, with_db_session
 
 
 class Verification:

@@ -3,10 +3,11 @@ from functools import wraps
 
 from sqlalchemy import select
 from telegram.ext import ConversationHandler
-from database.engine import session_maker
-from utils.constants import ADMIN_TELEGRAM_ID, ADMIN_ACCESS_FAILURE, NOT_CURATOR_ATTEMPT
-from database.models import User
 
+from database.engine import session_maker
+from database.models import User
+from utils.constants import (ADMIN_ACCESS_FAILURE, ADMIN_TELEGRAM_ID,
+                             NOT_CURATOR_ATTEMPT)
 
 logger = logging.getLogger(__name__)
 

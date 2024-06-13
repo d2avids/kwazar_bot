@@ -1,12 +1,17 @@
 from sqlalchemy import select
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
-from utils.constants import TASK_ANSWER_TEXT, GROUP_TYPE, INDIVIDUAL_TYPE, TEAM_TASK_ANSWER_TEXT, GROUP_ANSWER_ACCEPTED, \
-    GROUP_ANSWER_ALREADY_SUBMITTED, NO_ACTIVE_GROUP_TASKS, ENTER_GROUP_TASK_ANSWER_TEXT, TEAM_NOT_REGISTERED, \
-    NOT_REGISTERED, REGISTRATION_NOT_CONFIRMED, NO_ACTIVE_INDIVIDUAL_TASKS, ENTER_TASK_ANSWER_TEXT, \
-    ANSWER_NOT_ALLOWED_YET, DEADLINE_PASSED, ANSWER_ALREADY_SUBMITTED, ANSWER_ACCEPTED
 
-from database.models import Task, User, UserAnswer, Team, GroupTaskAnswer
+from database.models import GroupTaskAnswer, Task, Team, User, UserAnswer
+from utils.constants import (ANSWER_ACCEPTED, ANSWER_ALREADY_SUBMITTED,
+                             ANSWER_NOT_ALLOWED_YET, DEADLINE_PASSED,
+                             ENTER_GROUP_TASK_ANSWER_TEXT,
+                             ENTER_TASK_ANSWER_TEXT, GROUP_ANSWER_ACCEPTED,
+                             GROUP_ANSWER_ALREADY_SUBMITTED, GROUP_TYPE,
+                             INDIVIDUAL_TYPE, NO_ACTIVE_GROUP_TASKS,
+                             NO_ACTIVE_INDIVIDUAL_TASKS, NOT_REGISTERED,
+                             REGISTRATION_NOT_CONFIRMED, TASK_ANSWER_TEXT,
+                             TEAM_NOT_REGISTERED, TEAM_TASK_ANSWER_TEXT)
 from utils.decorators import with_db_session
 from utils.utils import get_current_datetime
 

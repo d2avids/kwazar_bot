@@ -1,16 +1,17 @@
 import os
-
-import pandas as pd
 from datetime import datetime
 
+import pandas as pd
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from telegram import Update, ReplyKeyboardRemove
-from telegram.ext import ConversationHandler, ContextTypes
+from telegram import ReplyKeyboardRemove, Update
+from telegram.ext import ContextTypes, ConversationHandler
 
-from database.models import UserAnswer, User, Task, GroupTaskAnswer, Team
-from utils.constants import INDIVIDUAL_TYPE, START_DATE, END_DATE, REPORTS_PATH, GROUP_TYPE, START_PERIOD_MESSAGE, \
-    END_PERIOD_MESSAGE, INCORRECT_DATE_MESSAGE, NO_DATA_FOR_PERIOD
+from database.models import GroupTaskAnswer, Task, Team, User, UserAnswer
+from utils.constants import (END_DATE, END_PERIOD_MESSAGE, GROUP_TYPE,
+                             INCORRECT_DATE_MESSAGE, INDIVIDUAL_TYPE,
+                             NO_DATA_FOR_PERIOD, REPORTS_PATH, START_DATE,
+                             START_PERIOD_MESSAGE)
 from utils.decorators import tutor_or_admin_required, with_db_session
 
 

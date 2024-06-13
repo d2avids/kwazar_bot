@@ -1,5 +1,5 @@
-import logging
 import asyncio
+import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
 
@@ -10,30 +10,41 @@ load_dotenv(find_dotenv())
 nest_asyncio.apply()
 
 from sqlalchemy import select
+from telegram import ReplyKeyboardMarkup, Update
+from telegram.ext import (ApplicationBuilder, CommandHandler, ContextTypes,
+                          ConversationHandler, MessageHandler, filters)
 
-from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
-from utils.constants import START_MESSAGE, ABOUT_PROJECT_MESSAGE, USER_INSTRUCTIONS_MESSAGE, SURNAME, NAME, PATRONYMIC, \
-    SCHOOL_NAME, CLASS_NUMBER, CLASS_SYMBOL, \
-    VERIFICATION_START, VERIFICATION_PROCESS, SEARCH_USER, ADD_TUTOR, USER_BUTTONS, CURATOR_BUTTONS, TASK_TYPE, \
-    TASK_DEADLINE, TASK_TEXT, SENDING_TASK_TIME, GETTING_ANSWERS_TIME, TASK_ANSWER_TEXT, FEEDBACK_TYPE, CHOOSE_FEEDBACK, \
-    GIVE_FEEDBACK, NEXT_ACTION, START_DATE, END_DATE, TEAM_NAME, TEAM_SCHOOL_NAME, TEAM_CLASS_NUMBER, TEAM_CLASS_SYMBOL, \
-    TEAM_CONFIRMATION, ADMIN_TELEGRAM_ID, CURATOR_INSTRUCTIONS_MESSAGE, \
-    REGISTRATION_MESSAGE, TEAM_REGISTRATION_MESSAGE, ADD_NEW_TASK, GIVE_INDIVIDUAL_ANSWER, CHECK_ANSWERS, \
-    GET_INDIVIDUAL_REPORT, GET_TEAM_REPORT, GIVE_TEAM_ANSWER, INDIVIDUAL_MARKS, TEAM_MARKS, BOT_INSTRUCTION, \
-    TEAM_BUTTONS, ADMIN_INSTRUCTIONS_MESSAGE_1, ADMIN_INSTRUCTIONS_MESSAGE_2
-
-from utils.decorators import with_db_session
 from database.engine import create_db
-from handlers.feedback import AddFeedback, next_action, GetFeedback
-from handlers.registration import Registration, TeamRegistration
-from handlers.verification import Verification
-from handlers.reports import IndividualReport, TeamReport
-from handlers.add_task_answer import AddTaskUserAnswer, AddGroupTaskAnswer
-from handlers.add_task import AddTask, finish_test
-from handlers.add_tutor import AddTutor
-from handlers.search_user import SearchUser
 from database.models import User
+from handlers.add_task import AddTask, finish_test
+from handlers.add_task_answer import AddGroupTaskAnswer, AddTaskUserAnswer
+from handlers.add_tutor import AddTutor
+from handlers.feedback import AddFeedback, GetFeedback, next_action
+from handlers.registration import Registration, TeamRegistration
+from handlers.reports import IndividualReport, TeamReport
+from handlers.search_user import SearchUser
+from handlers.verification import Verification
+from utils.constants import (ABOUT_PROJECT_MESSAGE, ADD_NEW_TASK, ADD_TUTOR,
+                             ADMIN_INSTRUCTIONS_MESSAGE_1,
+                             ADMIN_INSTRUCTIONS_MESSAGE_2, ADMIN_TELEGRAM_ID,
+                             BOT_INSTRUCTION, CHECK_ANSWERS, CHOOSE_FEEDBACK,
+                             CLASS_NUMBER, CLASS_SYMBOL, CURATOR_BUTTONS,
+                             CURATOR_INSTRUCTIONS_MESSAGE, END_DATE,
+                             FEEDBACK_TYPE, GET_INDIVIDUAL_REPORT,
+                             GET_TEAM_REPORT, GETTING_ANSWERS_TIME,
+                             GIVE_FEEDBACK, GIVE_INDIVIDUAL_ANSWER,
+                             GIVE_TEAM_ANSWER, INDIVIDUAL_MARKS, NAME,
+                             NEXT_ACTION, PATRONYMIC, REGISTRATION_MESSAGE,
+                             SCHOOL_NAME, SEARCH_USER, SENDING_TASK_TIME,
+                             START_DATE, START_MESSAGE, SURNAME,
+                             TASK_ANSWER_TEXT, TASK_DEADLINE, TASK_TEXT,
+                             TASK_TYPE, TEAM_BUTTONS, TEAM_CLASS_NUMBER,
+                             TEAM_CLASS_SYMBOL, TEAM_CONFIRMATION, TEAM_MARKS,
+                             TEAM_NAME, TEAM_REGISTRATION_MESSAGE,
+                             TEAM_SCHOOL_NAME, USER_BUTTONS,
+                             USER_INSTRUCTIONS_MESSAGE, VERIFICATION_PROCESS,
+                             VERIFICATION_START)
+from utils.decorators import with_db_session
 
 
 class ExcludeLoggerFilter(logging.Filter):

@@ -2,18 +2,28 @@ from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import ContextTypes, ConversationHandler
-from utils.constants import TASK_TYPES_BUTTONS, \
-    ADD_INDIVIDUAL_TASK_BUTTON, ADD_GROUP_TASK_BUTTON, ADD_TASK_TEXT_MESSAGE, ADD_DEADLINE_MESSAGE, \
-    ADD_GETTING_ANSWERS_TIME_MESSAGE, ADD_TASK_SUCCESS_MESSAGE, ADD_SENDING_TASK_TIME_MESSAGE, TASK_TYPE, TASK_TEXT, \
-    TASK_DEADLINE, SENDING_TASK_TIME, GETTING_ANSWERS_TIME, ADD_TASK_TYPE_MESSAGE, TASK_ALREADY_EXISTS, \
-    TASK_FINISHED_ADMIN_MESSAGE, INDIVIDUAL_TYPE, GROUP_TYPE, CANCEL_ACTION, ADD_TASK_CANCEL_MESSAGE, CANCEL_BUTTON, \
-    INVALID_DATE_MESSAGE, INCORRECT_TASK_TYPE, INCORRECT_DEADLINE, INCORRECT_SENDING_TIME, \
-    SENDING_TIME_LESS_THAN_DEADLINE, SENDING_TIME_LESS_THAN_NOW, INCORRECT_GETTING_TIME, \
-    GETTING_TIME_GREATER_THAN_DEADLINE, GETTING_TIME_LESS_THAN_SENDING_TIME
 
 from database.models import Task
+from utils.constants import (ADD_DEADLINE_MESSAGE,
+                             ADD_GETTING_ANSWERS_TIME_MESSAGE,
+                             ADD_GROUP_TASK_BUTTON, ADD_INDIVIDUAL_TASK_BUTTON,
+                             ADD_SENDING_TASK_TIME_MESSAGE,
+                             ADD_TASK_CANCEL_MESSAGE, ADD_TASK_SUCCESS_MESSAGE,
+                             ADD_TASK_TEXT_MESSAGE, ADD_TASK_TYPE_MESSAGE,
+                             CANCEL_ACTION, CANCEL_BUTTON,
+                             GETTING_ANSWERS_TIME,
+                             GETTING_TIME_GREATER_THAN_DEADLINE,
+                             GETTING_TIME_LESS_THAN_SENDING_TIME, GROUP_TYPE,
+                             INCORRECT_DEADLINE, INCORRECT_GETTING_TIME,
+                             INCORRECT_SENDING_TIME, INCORRECT_TASK_TYPE,
+                             INDIVIDUAL_TYPE, INVALID_DATE_MESSAGE,
+                             SENDING_TASK_TIME,
+                             SENDING_TIME_LESS_THAN_DEADLINE,
+                             SENDING_TIME_LESS_THAN_NOW, TASK_ALREADY_EXISTS,
+                             TASK_DEADLINE, TASK_FINISHED_ADMIN_MESSAGE,
+                             TASK_TEXT, TASK_TYPE, TASK_TYPES_BUTTONS)
 from utils.decorators import tutor_or_admin_required, with_db_session
 from utils.scheduler import schedule_task
 

@@ -1,14 +1,14 @@
 import logging
+from datetime import datetime
 
-from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
+from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
 from sqlalchemy.future import select
-from datetime import datetime
 from telegram.ext import ContextTypes
 
-from utils.constants import INDIVIDUAL_TYPE, GROUP_TYPE
-from database.models import Task, User, Team
+from database.models import Task, Team, User
+from utils.constants import GROUP_TYPE, INDIVIDUAL_TYPE
 from utils.utils import adjust_datetime_for_scheduler
 
 scheduler = AsyncIOScheduler()

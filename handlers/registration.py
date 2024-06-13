@@ -1,20 +1,38 @@
-from telegram import Update, ReplyKeyboardRemove, ReplyKeyboardMarkup
-from telegram.ext import ContextTypes, ConversationHandler
-from utils.constants import SURNAME, REGISTRATION_MESSAGE_SURNAME, \
-    REGISTRATION_MESSAGE_NAME, NAME, REGISTRATION_MESSAGE_PATRONYMIC, PATRONYMIC, REGISTRATION_MESSAGE_SCHOOL_NAME, \
-    SCHOOL_NAME, REGISTRATION_MESSAGE_CLASS_NUMBER, CLASS_NUMBER, REGISTRATION_MESSAGE_CLASS_SYMBOL, CLASS_SYMBOL, \
-    FIO_VALIDATION_MESSAGE, SCHOOL_NAME_VALIDATION_MESSAGE, CLASS_NUMBER_VALIDATION_MESSAGE, \
-    REGISTRATION_FINISHED_MESSAGE, REGISTRATION_CANCELED_MESSAGE, CLASS_SYMBOL_VALIDATION_MESSAGE, \
-    EXCEEDED_REGISTRATION_LIMIT_MESSAGE, ADMIN_TELEGRAM_ID, NEW_USER_NOTIFICATION, MSG_PROCESS_CANCELLED, \
-    MSG_TEAM_REGISTRATION_CANCELLED, MSG_TEAM_REGISTERED_SUCCESS, MSG_CONFIRM_TEAM_REGISTRATION, \
-    MSG_INVALID_CLASS_SYMBOL, MSG_INVALID_CLASS_NUMBER, MSG_ENTER_CLASS_SYMBOL, MSG_ENTER_CLASS_NUMBER, \
-    MSG_SCHOOL_NAME_TOO_LONG, MSG_TEAM_NAME_TOO_LONG, MSG_ENTER_SCHOOL_NAME, MSG_ENTER_TEAM_NAME, MSG_USER_NOT_VERIFIED, \
-    MSG_USER_NOT_FOUND, MSG_GROUP_CHAT_ONLY, CONFIRMATION_BUTTONS, TEAM_NAME, TEAM_SCHOOL_NAME, TEAM_CLASS_NUMBER, \
-    TEAM_CLASS_SYMBOL, TEAM_CONFIRMATION, MSG_CHAT_ALREADY_REGISTERED
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram.ext import ContextTypes, ConversationHandler
+
+from database.models import Team, User
+from utils.constants import (ADMIN_TELEGRAM_ID, CLASS_NUMBER,
+                             CLASS_NUMBER_VALIDATION_MESSAGE, CLASS_SYMBOL,
+                             CLASS_SYMBOL_VALIDATION_MESSAGE,
+                             CONFIRMATION_BUTTONS,
+                             EXCEEDED_REGISTRATION_LIMIT_MESSAGE,
+                             FIO_VALIDATION_MESSAGE,
+                             MSG_CHAT_ALREADY_REGISTERED,
+                             MSG_CONFIRM_TEAM_REGISTRATION,
+                             MSG_ENTER_CLASS_NUMBER, MSG_ENTER_CLASS_SYMBOL,
+                             MSG_ENTER_SCHOOL_NAME, MSG_ENTER_TEAM_NAME,
+                             MSG_GROUP_CHAT_ONLY, MSG_INVALID_CLASS_NUMBER,
+                             MSG_INVALID_CLASS_SYMBOL, MSG_PROCESS_CANCELLED,
+                             MSG_SCHOOL_NAME_TOO_LONG, MSG_TEAM_NAME_TOO_LONG,
+                             MSG_TEAM_REGISTERED_SUCCESS,
+                             MSG_TEAM_REGISTRATION_CANCELLED,
+                             MSG_USER_NOT_FOUND, MSG_USER_NOT_VERIFIED, NAME,
+                             NEW_USER_NOTIFICATION, PATRONYMIC,
+                             REGISTRATION_CANCELED_MESSAGE,
+                             REGISTRATION_FINISHED_MESSAGE,
+                             REGISTRATION_MESSAGE_CLASS_NUMBER,
+                             REGISTRATION_MESSAGE_CLASS_SYMBOL,
+                             REGISTRATION_MESSAGE_NAME,
+                             REGISTRATION_MESSAGE_PATRONYMIC,
+                             REGISTRATION_MESSAGE_SCHOOL_NAME,
+                             REGISTRATION_MESSAGE_SURNAME, SCHOOL_NAME,
+                             SCHOOL_NAME_VALIDATION_MESSAGE, SURNAME,
+                             TEAM_CLASS_NUMBER, TEAM_CLASS_SYMBOL,
+                             TEAM_CONFIRMATION, TEAM_NAME, TEAM_SCHOOL_NAME)
 from utils.decorators import with_db_session
-from database.models import User, Team
 
 
 class Registration:

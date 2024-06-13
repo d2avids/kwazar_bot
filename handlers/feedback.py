@@ -1,18 +1,28 @@
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
-from utils.constants import TASK_ANSWER_TEXT, FEEDBACK_TYPE, CHOOSE_TASK_TYPE_MESSAGE, \
-    CHOOSE_SCHOOL_NUMBER_MESSAGE, CHOOSE_CLASS_NUMBER_MESSAGE, CLASS_NUMBER, INDIVIDUAL_TYPE, GIVE_FEEDBACK, \
-    NO_ANSWERS_TO_ESTIMATE, NEXT_ACTION, ALLOWED_MARKS, NOT_ALLOWED_FEEDBACK_MESSAGE, \
-    ESTIMATED_ALL_ANSWERS_MESSAGE, STOPPED_ESTIMATING, INCORRECT_ACTION_CHOSEN, CHOOSE_ACTION_MESSAGE, \
-    USER_FEEDBACK_NOTIFICATION_MESSAGE, CHOOSE_FEEDBACK, INDIVIDUAL_ANSWER, GROUP_ANSWER, ANSWER_TYPES_BUTTONS, \
-    GROUP_TYPE, CANCEL_ACTION, INCORRECT_ANSWER_MESSAGE, CHOOSE_MARK, INCORRECT_ANSWER_ID, \
-    REGISTRATION_REQUIRED_MESSAGE, VERIFICATION_REQUIRED_MESSAGE, ANSWERS_NOT_FOUND, TEAM_REGISTRATION_REQUIRED, \
-    ONLY_TEAM_CHAT, USER_FEEDBACK_MARK_MESSAGE, ANSWER_IS_NOT_PROCESSED
 
-from database.models import Task, User, UserAnswer, GroupTaskAnswer, Team
-from utils.decorators import with_db_session, tutor_or_admin_required
+from database.models import GroupTaskAnswer, Task, Team, User, UserAnswer
+from utils.constants import (ALLOWED_MARKS, ANSWER_IS_NOT_PROCESSED,
+                             ANSWER_TYPES_BUTTONS, ANSWERS_NOT_FOUND,
+                             CANCEL_ACTION, CHOOSE_ACTION_MESSAGE,
+                             CHOOSE_CLASS_NUMBER_MESSAGE, CHOOSE_FEEDBACK,
+                             CHOOSE_MARK, CHOOSE_SCHOOL_NUMBER_MESSAGE,
+                             CHOOSE_TASK_TYPE_MESSAGE, CLASS_NUMBER,
+                             ESTIMATED_ALL_ANSWERS_MESSAGE, FEEDBACK_TYPE,
+                             GIVE_FEEDBACK, GROUP_ANSWER, GROUP_TYPE,
+                             INCORRECT_ACTION_CHOSEN, INCORRECT_ANSWER_ID,
+                             INCORRECT_ANSWER_MESSAGE, INDIVIDUAL_ANSWER,
+                             INDIVIDUAL_TYPE, NEXT_ACTION,
+                             NO_ANSWERS_TO_ESTIMATE,
+                             NOT_ALLOWED_FEEDBACK_MESSAGE, ONLY_TEAM_CHAT,
+                             REGISTRATION_REQUIRED_MESSAGE, STOPPED_ESTIMATING,
+                             TASK_ANSWER_TEXT, TEAM_REGISTRATION_REQUIRED,
+                             USER_FEEDBACK_MARK_MESSAGE,
+                             USER_FEEDBACK_NOTIFICATION_MESSAGE,
+                             VERIFICATION_REQUIRED_MESSAGE)
+from utils.decorators import tutor_or_admin_required, with_db_session
 
 NEXT_ANSWER = 'Следующий ответ'
 STOP = 'Завершить'

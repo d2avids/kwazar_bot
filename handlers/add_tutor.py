@@ -1,11 +1,12 @@
 from sqlalchemy import select
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler
 
-from utils.constants import ADD_TUTOR_SUCCESS, ADD_TUTOR, ASK_ID_TUTOR_TO_ADD, CANCEL_ACTION, CANCEL_BUTTON, \
-    INCORRECT_ID, TUTOR_ID_NOT_FOUND
-from utils.decorators import with_db_session, admin_required
 from database.models import User
+from utils.constants import (ADD_TUTOR, ADD_TUTOR_SUCCESS, ASK_ID_TUTOR_TO_ADD,
+                             CANCEL_ACTION, CANCEL_BUTTON, INCORRECT_ID,
+                             TUTOR_ID_NOT_FOUND)
+from utils.decorators import admin_required, with_db_session
 
 
 class AddTutor:
