@@ -4,7 +4,7 @@ from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
 from sqlalchemy.future import select
-from datetime import datetime, timedelta
+from datetime import datetime
 from telegram.ext import ContextTypes
 
 from utils.constants import INDIVIDUAL_TYPE, GROUP_TYPE
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 async def send_individual_task(task_id: int, context: ContextTypes.DEFAULT_TYPE):
-    logger.info(f"Sending individual task with ID: {task_id}")
+    logger.info(f'Sending individual task with ID: {task_id}')
     db_session = context.chat_data['db_session']
     stmt = select(Task).filter_by(id=task_id)
     result = await db_session.execute(stmt)
@@ -36,18 +36,18 @@ async def send_individual_task(task_id: int, context: ContextTypes.DEFAULT_TYPE)
     )
     for telegram_id in user_telegram_ids:
         await context.bot.send_message(chat_id=telegram_id, text=message_to_send, parse_mode='HTML')
-        logger.info(f"Sent task with ID {task_id} to user with telegram ID: {telegram_id}")
+        logger.info(f'Sent task with ID {task_id} to user with telegram ID: {telegram_id}')
 
 
 async def send_group_task(task_id: int, context: ContextTypes.DEFAULT_TYPE):
-    logger.info(f"Sending group task with ID: {task_id}")
+    logger.info(f'Sending group task with ID: {task_id}')
     db_session = context.chat_data['db_session']
     stmt = select(Task).filter_by(id=task_id)
     result = await db_session.execute(stmt)
     task = result.scalar()
 
     if not task:
-        logger.error(f"Task with ID {task_id} not found")
+        logger.error(f'Task with ID {task_id} not found')
         return
 
     stmt = select(Team.telegram_id)
@@ -60,14 +60,14 @@ async def send_group_task(task_id: int, context: ContextTypes.DEFAULT_TYPE):
     )
     for telegram_id in team_telegram_ids:
         await context.bot.send_message(chat_id=telegram_id, text=message_to_send, parse_mode='HTML')
-        logger.info(f"Sent task with ID {task_id} to team with telegram ID: {telegram_id}")
+        logger.info(f'Sent task with ID {task_id} to team with telegram ID: {telegram_id}')
 
 
 def job_listener(event):
     if event.exception:
-        logger.error(f"Job {event.job_id} failed: {event.exception}")
+        logger.error(f'Job {event.job_id} failed: {event.exception}')
     else:
-        logger.info(f"Job {event.job_id} executed successfully")
+        logger.info(f'Job {event.job_id} executed successfully')
 
 
 async def schedule_task(task_id: int, task_type: str, sending_task_time: datetime, context: ContextTypes.DEFAULT_TYPE):

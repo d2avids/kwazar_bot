@@ -9,7 +9,9 @@ from utils.constants import TASK_TYPES_BUTTONS, \
     ADD_GETTING_ANSWERS_TIME_MESSAGE, ADD_TASK_SUCCESS_MESSAGE, ADD_SENDING_TASK_TIME_MESSAGE, TASK_TYPE, TASK_TEXT, \
     TASK_DEADLINE, SENDING_TASK_TIME, GETTING_ANSWERS_TIME, ADD_TASK_TYPE_MESSAGE, TASK_ALREADY_EXISTS, \
     TASK_FINISHED_ADMIN_MESSAGE, INDIVIDUAL_TYPE, GROUP_TYPE, CANCEL_ACTION, ADD_TASK_CANCEL_MESSAGE, CANCEL_BUTTON, \
-    INVALID_DATE_MESSAGE
+    INVALID_DATE_MESSAGE, INCORRECT_TASK_TYPE, INCORRECT_DEADLINE, INCORRECT_SENDING_TIME, \
+    SENDING_TIME_LESS_THAN_DEADLINE, SENDING_TIME_LESS_THAN_NOW, INCORRECT_GETTING_TIME, \
+    GETTING_TIME_GREATER_THAN_DEADLINE, GETTING_TIME_LESS_THAN_SENDING_TIME
 
 from database.models import Task
 from utils.decorators import tutor_or_admin_required, with_db_session
@@ -90,9 +92,7 @@ class AddTask:
         elif task_type == ADD_GROUP_TASK_BUTTON:
             context.user_data['task_type'] = GROUP_TYPE
         else:
-            await update.message.reply_text(
-                'Некорректный тип задания. Пожалуйста, выберите тип задания или нажмите "Отменить".'
-            )
+            await update.message.reply_text(INCORRECT_TASK_TYPE)
             return TASK_TYPE
         await update.message.reply_text(
             ADD_TASK_TEXT_MESSAGE,
@@ -126,10 +126,7 @@ class AddTask:
 
         task_deadline = datetime.strptime(deadline_text, '%d.%m.%Y %H:%M')
         if task_deadline < datetime.now():
-            await update.message.reply_text(
-                'Дедлайн не может быть меньше текущего времени. '
-                'Пожалуйста, введите корректное время или нажмите "Отменить".'
-            )
+            await update.message.reply_text(INCORRECT_DEADLINE)
             return TASK_DEADLINE
 
         context.user_data['task_deadline'] = task_deadline
@@ -148,25 +145,16 @@ class AddTask:
 
         sending_task_time_text = update.message.text
         if not validate_datetime(sending_task_time_text, '%d.%m.%Y %H:%M'):
-            await update.message.reply_text(
-                'Некорректный формат времени отправки задания. '
-                'Пожалуйста, введите корректное время или нажмите "Отменить".'
-            )
+            await update.message.reply_text(INCORRECT_SENDING_TIME)
             return SENDING_TASK_TIME
         sending_task_time = datetime.strptime(sending_task_time_text, '%d.%m.%Y %H:%M')
 
         if sending_task_time > context.user_data['task_deadline']:
-            await update.message.reply_text(
-                'Время отправки задания не может быть позже дедлайна. '
-                'Пожалуйста, введите корректное время или нажмите "Отменить".'
-            )
+            await update.message.reply_text(SENDING_TIME_LESS_THAN_DEADLINE)
             return SENDING_TASK_TIME
 
         if sending_task_time < datetime.now():
-            await update.message.reply_text(
-                'Время отправки задания не может быть меньше текущего времени. '
-                'Пожалуйста, введите корректное время или нажмите "Отменить".'
-            )
+            await update.message.reply_text(SENDING_TIME_LESS_THAN_NOW)
             return SENDING_TASK_TIME
 
         context.user_data['sending_task_time'] = sending_task_time
@@ -201,24 +189,19 @@ class AddTask:
 
         getting_answers_time_text = update.message.text
         if not validate_datetime(getting_answers_time_text, '%d.%m.%Y %H:%M'):
-            await update.message.reply_text(
-                'Некорректный формат времени начала принятия ответов. '
-                'Пожалуйста, введите корректное время или нажмите "Отменить".'
-            )
+            await update.message.reply_text(INCORRECT_GETTING_TIME)
             return GETTING_ANSWERS_TIME
         getting_answers_time = datetime.strptime(getting_answers_time_text, '%d.%m.%Y %H:%M')
 
         if getting_answers_time > context.user_data['task_deadline']:
             await update.message.reply_text(
-                'Время начала принятия ответов не может быть позже дедлайна. '
-                'Пожалуйста, введите корректное время или нажмите "Отменить".'
+                GETTING_TIME_GREATER_THAN_DEADLINE
             )
             return GETTING_ANSWERS_TIME
 
         if getting_answers_time < context.user_data['sending_task_time']:
             await update.message.reply_text(
-                'Время начала принятия ответов не может быть раньше времени отправки задания. '
-                'Пожалуйста, введите корректное время или нажмите "Отменить".'
+                GETTING_TIME_LESS_THAN_SENDING_TIME
             )
             return GETTING_ANSWERS_TIME
 

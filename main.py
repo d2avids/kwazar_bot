@@ -13,14 +13,15 @@ from sqlalchemy import select
 
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
-from utils.constants import START_MESSAGE, ABOUT_PROJECT_MESSAGE, INSTRUCTIONS_MESSAGE, SURNAME, NAME, PATRONYMIC, \
+from utils.constants import START_MESSAGE, ABOUT_PROJECT_MESSAGE, USER_INSTRUCTIONS_MESSAGE, SURNAME, NAME, PATRONYMIC, \
     SCHOOL_NAME, CLASS_NUMBER, CLASS_SYMBOL, \
     VERIFICATION_START, VERIFICATION_PROCESS, SEARCH_USER, ADD_TUTOR, USER_BUTTONS, CURATOR_BUTTONS, TASK_TYPE, \
     TASK_DEADLINE, TASK_TEXT, SENDING_TASK_TIME, GETTING_ANSWERS_TIME, TASK_ANSWER_TEXT, FEEDBACK_TYPE, CHOOSE_FEEDBACK, \
     GIVE_FEEDBACK, NEXT_ACTION, START_DATE, END_DATE, TEAM_NAME, TEAM_SCHOOL_NAME, TEAM_CLASS_NUMBER, TEAM_CLASS_SYMBOL, \
-    TEAM_CONFIRMATION, TEAM_BUTTONS, REGISTRATION_MESSAGE, TEAM_REGISTRATION_MESSAGE, GIVE_INDIVIDUAL_ANSWER, \
-    GIVE_TEAM_ANSWER, CHECK_ANSWERS, BOT_INSTRUCTION, ADD_NEW_TASK, ADMIN_TELEGRAM_ID, INDIVIDUAL_MARKS, TEAM_MARKS, \
-    GET_INDIVIDUAL_REPORT, GET_TEAM_REPORT
+    TEAM_CONFIRMATION, ADMIN_TELEGRAM_ID, CURATOR_INSTRUCTIONS_MESSAGE, \
+    REGISTRATION_MESSAGE, TEAM_REGISTRATION_MESSAGE, ADD_NEW_TASK, GIVE_INDIVIDUAL_ANSWER, CHECK_ANSWERS, \
+    GET_INDIVIDUAL_REPORT, GET_TEAM_REPORT, GIVE_TEAM_ANSWER, INDIVIDUAL_MARKS, TEAM_MARKS, BOT_INSTRUCTION, \
+    TEAM_BUTTONS, ADMIN_INSTRUCTIONS_MESSAGE_1, ADMIN_INSTRUCTIONS_MESSAGE_2
 
 from utils.decorators import with_db_session
 from database.engine import create_db
@@ -81,8 +82,22 @@ async def send_about_project_message(update: Update, context: ContextTypes.DEFAU
     await update.message.reply_text(ABOUT_PROJECT_MESSAGE)
 
 
+@with_db_session
 async def send_instruction_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(INSTRUCTIONS_MESSAGE, parse_mode='HTML')
+    user_telegram_id = update.message.chat_id
+    if str(user_telegram_id) == ADMIN_TELEGRAM_ID:
+        await update.message.reply_text(ADMIN_INSTRUCTIONS_MESSAGE_1, parse_mode='HTML')
+        await asyncio.sleep(0.05)
+        await update.message.reply_text(ADMIN_INSTRUCTIONS_MESSAGE_2, parse_mode='HTML')
+        return
+    db_session = context.chat_data['db_session']
+    stmt = select(User).filter_by(telegram_id=user_telegram_id)
+    result = await db_session.execute(stmt)
+    user = result.scalars().one_or_none()
+    if not user or not user.is_curator:
+        await update.message.reply_text(USER_INSTRUCTIONS_MESSAGE, parse_mode='HTML')
+    elif user and user.is_curator:
+        await update.message.reply_text(CURATOR_INSTRUCTIONS_MESSAGE, parse_mode='HTML')
 
 
 async def cancel(update: Update, context: ContextTypes):

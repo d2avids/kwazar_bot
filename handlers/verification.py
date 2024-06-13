@@ -46,8 +46,8 @@ class Verification:
     async def process_verification(update: Update, context: ContextTypes.DEFAULT_TYPE):
         db_session = context.chat_data['db_session']
         text_parts = update.message.text.split()
-        action = text_parts[0].lower()  # Принять или отклонить
-        user_ids = text_parts[1:]  # Айдишники пользователей
+        action = text_parts[0].lower()
+        user_ids = text_parts[1:]
 
         if action not in [VERIFICATION_ACCEPT_COMMAND.lower(), VERIFICATION_REJECT_COMMAND.lower()]:
             await update.message.reply_text(INCORRECT_COMMAND)

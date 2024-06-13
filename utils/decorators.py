@@ -23,8 +23,8 @@ def with_db_session(func):
 def admin_required(func):
     @wraps(func)
     async def wrapped(update, context, *args, **kwargs):
-        user_id = str(update.message.chat_id)
-        if user_id != ADMIN_TELEGRAM_ID:
+        user_id = update.message.chat_id
+        if str(user_id) != ADMIN_TELEGRAM_ID:
             await update.message.reply_text(ADMIN_ACCESS_FAILURE)
             return ConversationHandler.END
         return await func(update, context, *args, **kwargs)
