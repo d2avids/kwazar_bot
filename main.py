@@ -46,6 +46,8 @@ from utils.constants import (ABOUT_PROJECT_MESSAGE, ADD_NEW_TASK, ADD_TUTOR,
                              VERIFICATION_START)
 from utils.decorators import with_db_session
 
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+
 
 class ExcludeLoggerFilter(logging.Filter):
     def __init__(self, name):
