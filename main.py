@@ -119,7 +119,7 @@ async def cancel(update: Update, context: ContextTypes):
 
 async def main():
     await create_db()
-    app = ApplicationBuilder().token("7051184649:AAHkfbd_ghMDI-SgDJfvxhbrQ7iwZYPn49A").build()
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     registration_handler = ConversationHandler(
         entry_points=[MessageHandler(filters.Text([REGISTRATION_MESSAGE]), Registration.start_registration)],

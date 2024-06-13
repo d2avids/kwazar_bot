@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 
 from database.models import User
-from utils.constants import (ASK_ID_TUTOR_TO_ADD, REQUEST_LAST_NAME,
+from utils.constants import (REQUEST_LAST_NAME,
                              SEARCH_USER, USERS_NOT_FOUND)
 from utils.decorators import admin_required, with_db_session
 

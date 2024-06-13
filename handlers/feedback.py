@@ -7,10 +7,9 @@ from database.models import GroupTaskAnswer, Task, Team, User, UserAnswer
 from utils.constants import (ALLOWED_MARKS, ANSWER_IS_NOT_PROCESSED,
                              ANSWER_TYPES_BUTTONS, ANSWERS_NOT_FOUND,
                              CANCEL_ACTION, CHOOSE_ACTION_MESSAGE,
-                             CHOOSE_CLASS_NUMBER_MESSAGE, CHOOSE_FEEDBACK,
-                             CHOOSE_MARK, CHOOSE_SCHOOL_NUMBER_MESSAGE,
-                             CHOOSE_TASK_TYPE_MESSAGE, CLASS_NUMBER,
-                             ESTIMATED_ALL_ANSWERS_MESSAGE, FEEDBACK_TYPE,
+                             CHOOSE_FEEDBACK,
+                             CHOOSE_MARK,
+                             CHOOSE_TASK_TYPE_MESSAGE, FEEDBACK_TYPE,
                              GIVE_FEEDBACK, GROUP_ANSWER, GROUP_TYPE,
                              INCORRECT_ACTION_CHOSEN, INCORRECT_ANSWER_ID,
                              INCORRECT_ANSWER_MESSAGE, INDIVIDUAL_ANSWER,
@@ -18,7 +17,7 @@ from utils.constants import (ALLOWED_MARKS, ANSWER_IS_NOT_PROCESSED,
                              NO_ANSWERS_TO_ESTIMATE,
                              NOT_ALLOWED_FEEDBACK_MESSAGE, ONLY_TEAM_CHAT,
                              REGISTRATION_REQUIRED_MESSAGE, STOPPED_ESTIMATING,
-                             TASK_ANSWER_TEXT, TEAM_REGISTRATION_REQUIRED,
+                             TEAM_REGISTRATION_REQUIRED,
                              USER_FEEDBACK_MARK_MESSAGE,
                              USER_FEEDBACK_NOTIFICATION_MESSAGE,
                              VERIFICATION_REQUIRED_MESSAGE)
@@ -54,7 +53,7 @@ async def next_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
             )
             return ConversationHandler.END
-        await display_all_answers(update, context, answers, feedback_type)
+        await display_all_answers(update, context, set(answers), feedback_type)
         return CHOOSE_FEEDBACK
     elif action == STOP:
         await update.message.reply_text(STOPPED_ESTIMATING)
@@ -70,6 +69,8 @@ async def display_all_answers(update: Update, context: ContextTypes.DEFAULT_TYPE
     for answer in answers:
         if feedback_type == INDIVIDUAL_TYPE:
             user = answer.user
+            if not user:
+                continue
             full_name = f'{user.last_name} {user.first_name} {user.patronymic if user.patronymic else ""}'.strip()
             message += (
                 f'ID {answer.id}, {full_name}, школа: {user.school_name}, '
