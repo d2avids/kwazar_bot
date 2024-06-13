@@ -36,7 +36,7 @@ Email: [delightxxls@gmail.com](mailto:delightxxls@gmail.com)
 To start the bot, you need to set up the environment variables from the `.env_example` file. Make sure to configure the following:
 
 - `ADMIN_TELEGRAM_ID`: The Telegram ID of the TG user, who is going to function as an Administrator.
-- `TIMEZONE_OFFSET`: Set the timezone offset (e.g., `3` for UTC+3 or `-3` for UTC-3).
+- `TIMEZONE_OFFSET`: Set the timezone offset (e.g., `3` for UTC+3 or `-3` for UTC-3 if your server is set at UTC) relatively to your host machine time.
 - `BOT_TOKEN`: Set the token you've got from the BotFather in order to run the code in your bot instance.
 - `DATABASE_PATH`: If you don't have any specific preferences for the database, you may pass to an `.env` file the value from `.env_example`.
 
