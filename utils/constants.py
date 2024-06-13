@@ -473,6 +473,22 @@ TASK_ANSWER_TEXT = range(1)
 # Add team task answer
 TEAM_TASK_ANSWER_TEXT = range(1)
 
+NOT_REGISTERED = 'Вы не зарегистрированы в системе'
+REGISTRATION_NOT_CONFIRMED = 'Ваша регистрация не подтверждена'
+NO_ACTIVE_INDIVIDUAL_TASKS = 'Нет активных индивидуальных заданий'
+ENTER_TASK_ANSWER_TEXT = 'Введите текст ответа на задание'
+ANSWER_ALREADY_SUBMITTED = 'Вами уже был дан ответ на текущее задание. Повторная сдача ответа на задание не допускается'
+ANSWER_ACCEPTED = 'Ваш ответ принят'
+NO_ACTIVE_GROUP_TASKS = 'Нет активных групповых заданий'
+TEAM_NOT_REGISTERED = 'Команда не зарегистрирована в системе'
+ENTER_GROUP_TASK_ANSWER_TEXT = 'Введите текст ответа на групповое задание'
+GROUP_ANSWER_ALREADY_SUBMITTED = (
+    'На это задание уже был дан ответ вашей командой. Повторная сдача ответа на задание не допускается'
+)
+GROUP_ANSWER_ACCEPTED = 'Ответ вашей команды принят'
+ANSWER_NOT_ALLOWED_YET = 'Ответ на задание можно отправить не ранее {task_time}. Текущее время: {current_time}'
+DEADLINE_PASSED = 'Срок сдачи задания истек {deadline}'
+
 # Feedback
 FEEDBACK_TYPE, CHOOSE_FEEDBACK, GIVE_FEEDBACK, NEXT_ACTION = range(4)
 ALLOWED_MARKS = ('5', '4', '3', '2')

@@ -1,8 +1,10 @@
-from datetime import datetime
 from sqlalchemy import select
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
-from utils.constants import TASK_ANSWER_TEXT, GROUP_TYPE, INDIVIDUAL_TYPE, TEAM_TASK_ANSWER_TEXT
+from utils.constants import TASK_ANSWER_TEXT, GROUP_TYPE, INDIVIDUAL_TYPE, TEAM_TASK_ANSWER_TEXT, GROUP_ANSWER_ACCEPTED, \
+    GROUP_ANSWER_ALREADY_SUBMITTED, NO_ACTIVE_GROUP_TASKS, ENTER_GROUP_TASK_ANSWER_TEXT, TEAM_NOT_REGISTERED, \
+    NOT_REGISTERED, REGISTRATION_NOT_CONFIRMED, NO_ACTIVE_INDIVIDUAL_TASKS, ENTER_TASK_ANSWER_TEXT, \
+    ANSWER_NOT_ALLOWED_YET, DEADLINE_PASSED, ANSWER_ALREADY_SUBMITTED, ANSWER_ACCEPTED
 
 from database.models import Task, User, UserAnswer, Team, GroupTaskAnswer
 from utils.decorators import with_db_session
@@ -21,11 +23,11 @@ class AddTaskUserAnswer:
         user = result.scalars().first()
 
         if not user:
-            await update.message.reply_text('Вы не зарегистрированы в системе')
+            await update.message.reply_text(NOT_REGISTERED)
             return ConversationHandler.END
 
         if not user.is_verified:
-            await update.message.reply_text('Ваша регистрация не подтверждена')
+            await update.message.reply_text(REGISTRATION_NOT_CONFIRMED)
             return ConversationHandler.END
 
         stmt = select(Task).filter_by(type=INDIVIDUAL_TYPE, is_finished=False)
@@ -33,11 +35,11 @@ class AddTaskUserAnswer:
         task = result.scalars().first()
 
         if not task:
-            await update.message.reply_text('Нет активных индивидуальных заданий')
+            await update.message.reply_text(NO_ACTIVE_INDIVIDUAL_TASKS)
             return ConversationHandler.END
 
         context.user_data['user'] = user
-        await update.message.reply_text('Введите текст ответа на задание')
+        await update.message.reply_text(ENTER_TASK_ANSWER_TEXT)
         return TASK_ANSWER_TEXT
 
     @with_db_session
@@ -47,25 +49,29 @@ class AddTaskUserAnswer:
         user = context.user_data['user']
         db_session = context.chat_data['db_session']
 
-        stmt = select(Task).filter_by(type='individual', is_finished=False)
+        stmt = select(Task).filter_by(type=INDIVIDUAL_TYPE, is_finished=False)
         result = await db_session.execute(stmt)
         task = result.scalars().first()
 
         if not task:
-            await update.message.reply_text('Нет активных индивидуальных заданий')
+            await update.message.reply_text(NO_ACTIVE_INDIVIDUAL_TASKS)
             return ConversationHandler.END
 
         current_time = get_current_datetime()
         if task.getting_answers_time and current_time < task.getting_answers_time:
             await update.message.reply_text(
-                f'Ответ на задание можно отправить не ранее {task.getting_answers_time.strftime("%d.%m.%Y %H:%M")}. '
-                f'Текущее время: {current_time}'
+                ANSWER_NOT_ALLOWED_YET.format(
+                    task_time=task.getting_answers_time.strftime("%d.%m.%Y %H:%M"),
+                    current_time=current_time.strftime("%d.%m.%Y %H:%M")
+                )
             )
             return ConversationHandler.END
 
         if task.deadline and current_time > task.deadline:
             await update.message.reply_text(
-                f'Срок сдачи задания истек {task.deadline.strftime("%d.%m.%Y %H:%M")}'
+                DEADLINE_PASSED.format(
+                    deadline=task.deadline.strftime("%d.%m.%Y %H:%M")
+                )
             )
             return ConversationHandler.END
 
@@ -74,10 +80,7 @@ class AddTaskUserAnswer:
         existing_answer = existing_answer_result.scalars().first()
 
         if existing_answer:
-            await update.message.reply_text(
-                'Вами уже был дан ответ на текущее задание. '
-                'Повторная сдача ответа на задание не допускается'
-            )
+            await update.message.reply_text(ANSWER_ALREADY_SUBMITTED)
             return ConversationHandler.END
 
         new_answer = UserAnswer(
@@ -88,7 +91,7 @@ class AddTaskUserAnswer:
         db_session.add(new_answer)
         await db_session.commit()
 
-        await update.message.reply_text('Ваш ответ принят')
+        await update.message.reply_text(ANSWER_ACCEPTED)
         return ConversationHandler.END
 
 
@@ -103,20 +106,24 @@ class AddGroupTaskAnswer:
         task = result.scalars().first()
 
         if not task:
-            await update.message.reply_text('Нет активных групповых заданий')
+            await update.message.reply_text(NO_ACTIVE_GROUP_TASKS)
             return ConversationHandler.END
 
         current_time = get_current_datetime()
         if current_time < task.getting_answers_time:
             await update.message.reply_text(
-                f'Ответ на задание можно отправить не ранее {task.getting_answers_time.strftime("%d.%m.%Y %H:%M")}. '
-                f'Текущее время: {current_time}'
+                ANSWER_NOT_ALLOWED_YET.format(
+                    task_time=task.getting_answers_time.strftime("%d.%m.%Y %H:%M"),
+                    current_time=current_time.strftime("%d.%m.%Y %H:%M")
+                )
             )
             return ConversationHandler.END
 
         if task.deadline and current_time > task.deadline:
             await update.message.reply_text(
-                f'Срок сдачи задания истек {task.deadline.strftime("%d.%m.%Y %H:%M")}'
+                DEADLINE_PASSED.format(
+                    deadline=task.deadline.strftime("%d.%m.%Y %H:%M")
+                )
             )
             return ConversationHandler.END
 
@@ -127,11 +134,11 @@ class AddGroupTaskAnswer:
         team = result.scalars().first()
 
         if not team:
-            await update.message.reply_text('Команда не зарегистрирована в системе')
+            await update.message.reply_text(TEAM_NOT_REGISTERED)
             return ConversationHandler.END
 
         context.user_data['team'] = team
-        await update.message.reply_text('Введите текст ответа на групповое задание')
+        await update.message.reply_text(ENTER_GROUP_TASK_ANSWER_TEXT)
         return TEAM_TASK_ANSWER_TEXT
 
     @staticmethod
@@ -146,7 +153,7 @@ class AddGroupTaskAnswer:
         task = result.scalars().first()
 
         if not task:
-            await update.message.reply_text('Нет активных групповых заданий')
+            await update.message.reply_text(NO_ACTIVE_GROUP_TASKS)
             return ConversationHandler.END
 
         existing_answer_stmt = select(GroupTaskAnswer).filter_by(team_id=team.id, task_id=task.id)
@@ -154,10 +161,7 @@ class AddGroupTaskAnswer:
         existing_answer = existing_answer_result.scalars().first()
 
         if existing_answer:
-            await update.message.reply_text(
-                'На это задание уже был дан ответ вашей командой. '
-                'Повторная сдача ответа на задание не допускается'
-            )
+            await update.message.reply_text(GROUP_ANSWER_ALREADY_SUBMITTED)
             return ConversationHandler.END
 
         new_answer = GroupTaskAnswer(
@@ -168,5 +172,5 @@ class AddGroupTaskAnswer:
         db_session.add(new_answer)
         await db_session.commit()
 
-        await update.message.reply_text('Ответ вашей команды принят')
+        await update.message.reply_text(GROUP_ANSWER_ACCEPTED)
         return ConversationHandler.END
